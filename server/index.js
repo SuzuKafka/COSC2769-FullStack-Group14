@@ -8,6 +8,7 @@ const dotenv = require('dotenv');
 const authRouter = require('./routes/auth');
 const cartRouter = require('./routes/cart');
 const productRouter = require('./routes/products');
+const catalogRouter = require('./routes/catalog');
 
 // Load environment variables
 dotenv.config();
@@ -50,6 +51,7 @@ app.use(
 app.use('/api/auth', authRouter);
 app.use('/api/cart', cartRouter);
 app.use('/api/products', productRouter);
+app.use('/api/catalog', catalogRouter);
 
 if (isDevelopment) {
   // Temporary seeding utilities accessible only in development.
