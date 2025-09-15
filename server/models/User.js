@@ -1,0 +1,76 @@
+const mongoose = require('mongoose');
+
+const { Schema } = mongoose;
+
+const userSchema = new Schema(
+  {
+    username: {
+      type: String,
+      required: true,
+      unique: true,
+      minlength: 8,
+      maxlength: 15,
+      match: [/^[a-zA-Z0-9]+$/, 'Username must be alphanumeric'],
+      trim: true,
+    },
+    passwordHash: {
+      type: String,
+      required: true,
+    },
+    role: {
+      type: String,
+      required: true,
+      enum: ['customer', 'vendor', 'shipper'],
+    },
+    profileImagePath: {
+      type: String,
+    },
+    customerProfile: {
+      defaultAddress: {
+        type: String,
+      },
+    },
+    vendorProfile: {
+      companyName: {
+        type: String,
+        unique: true,
+        sparse: true,
+        trim: true,
+      },
+      contactEmail: {
+        type: String,
+        lowercase: true,
+        trim: true,
+      },
+    },
+    shipperProfile: {
+      licenseNumber: {
+        type: String,
+        unique: true,
+        sparse: true,
+        trim: true,
+      },
+      hub: {
+        type: Schema.Types.ObjectId,
+        ref: 'DistributionHub',
+      },
+    },
+  },
+  {
+    timestamps: true,
+  }
+);
+
+userSchema.pre('validate', function preValidate(next) {
+  if (this.role === 'vendor' && !this.vendorProfile?.companyName) {
+    return next(new Error('Vendor profile requires companyName.'));
+  }
+
+  if (this.role === 'shipper' && !this.shipperProfile?.licenseNumber) {
+    return next(new Error('Shipper profile requires licenseNumber.'));
+  }
+
+  return next();
+});
+
+module.exports = mongoose.model('User', userSchema);
