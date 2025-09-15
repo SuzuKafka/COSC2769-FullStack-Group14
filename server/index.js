@@ -1,14 +1,20 @@
 const express = require('express');
 const cors = require('cors');
 const mongoose = require('mongoose');
+const session = require('express-session');
+const MongoStore = require('connect-mongo');
 const dotenv = require('dotenv');
 const authRouter = require('./routes/auth');
+const cartRouter = require('./routes/cart');
 
 // Load environment variables
 dotenv.config();
 
 const app = express();
 const isDevelopment = process.env.NODE_ENV === 'development';
+const MONGODB_URI = process.env.MONGODB_URI;
+const SESSION_SECRET = process.env.SESSION_SECRET || 'development_secret';
+const PORT = process.env.PORT || 4000;
 
 app.use(cors({
   origin: 'http://localhost:3000',
@@ -16,7 +22,26 @@ app.use(cors({
 }));
 app.use(express.json());
 
+app.use(
+  session({
+    secret: SESSION_SECRET,
+    resave: false,
+    saveUninitialized: false,
+    store: MongoStore.create({
+      mongoUrl: MONGODB_URI,
+      collectionName: 'sessions',
+    }),
+    cookie: {
+      httpOnly: true,
+      secure: !isDevelopment,
+      sameSite: isDevelopment ? 'lax' : 'none',
+      maxAge: 1000 * 60 * 60 * 24,
+    },
+  })
+);
+
 app.use('/api/auth', authRouter);
+app.use('/api/cart', cartRouter);
 
 if (isDevelopment) {
   // Temporary seeding utilities accessible only in development.
@@ -27,9 +52,6 @@ if (isDevelopment) {
 app.get('/api/hello', (req, res) => {
   res.json({ message: 'Server running' });
 });
-
-const PORT = process.env.PORT || 5000;
-const MONGODB_URI = process.env.MONGODB_URI;
 
 async function startServer() {
   try {

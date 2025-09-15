@@ -1,3 +1,6 @@
+/**
+ * Development-only routes for seeding data in the COSC2769 project.
+ */
 const express = require('express');
 const DistributionHub = require('../models/DistributionHub');
 
