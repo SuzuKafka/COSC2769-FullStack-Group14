@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const mongoose = require('mongoose');
 const dotenv = require('dotenv');
+const authRouter = require('./routes/auth');
 
 // Load environment variables
 dotenv.config();
@@ -13,6 +14,8 @@ app.use(cors({
   credentials: true,
 }));
 app.use(express.json());
+
+app.use('/api/auth', authRouter);
 
 app.get('/api/hello', (req, res) => {
   res.json({ message: 'Server running' });
