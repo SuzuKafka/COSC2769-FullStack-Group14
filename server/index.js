@@ -16,6 +16,10 @@ const MONGODB_URI = process.env.MONGODB_URI;
 const SESSION_SECRET = process.env.SESSION_SECRET || 'development_secret';
 const PORT = process.env.PORT || 4000;
 
+if (!MONGODB_URI) {
+  throw new Error('MONGODB_URI is not defined.');
+}
+
 app.use(cors({
   origin: 'http://localhost:3000',
   credentials: true,
@@ -53,11 +57,27 @@ app.get('/api/hello', (req, res) => {
   res.json({ message: 'Server running' });
 });
 
+app.use((err, req, res, next) => {
+  // eslint-disable-next-line no-console
+  console.error(err);
+
+  let status = err.status || 500;
+  let message = err.message || 'Internal Server Error';
+
+  if (err.name === 'ValidationError') {
+    status = 400;
+    message = err.message;
+  } else if (err.code === 11000) {
+    status = 409;
+    const duplicateField = Object.keys(err.keyValue || {})[0];
+    message = duplicateField ? `Duplicate value for ${duplicateField}.` : 'Duplicate key error.';
+  }
+
+  res.status(status).json({ error: message });
+});
+
 async function startServer() {
   try {
-    if (!MONGODB_URI) {
-      throw new Error('MONGODB_URI is not defined.');
-    }
     await mongoose.connect(MONGODB_URI);
     console.log('Connected to MongoDB');
 

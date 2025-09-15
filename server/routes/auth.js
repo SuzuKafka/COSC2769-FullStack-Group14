@@ -4,11 +4,19 @@
 const express = require('express');
 const bcrypt = require('bcrypt');
 const User = require('../models/User');
+const asyncWrap = require('../middleware/asyncWrap');
+
+const createHttpError = (status, message) => {
+  const error = new Error(message);
+  error.status = status;
+  return error;
+};
 
 const router = express.Router();
 
-router.post('/register', async (req, res) => {
-  try {
+router.post(
+  '/register',
+  asyncWrap(async (req, res) => {
     const {
       username,
       password,
@@ -19,12 +27,12 @@ router.post('/register', async (req, res) => {
     } = req.body;
 
     if (!username || !password || !role) {
-      return res.status(400).json({ message: 'Username, password, and role are required.' });
+      throw createHttpError(400, 'Username, password, and role are required.');
     }
 
     const existingUser = await User.findOne({ username });
     if (existingUser) {
-      return res.status(409).json({ message: 'Username already taken.' });
+      throw createHttpError(409, 'Username already taken.');
     }
 
     const passwordHash = await bcrypt.hash(password, 10);
@@ -36,7 +44,7 @@ router.post('/register', async (req, res) => {
 
     if (role === 'vendor') {
       if (!vendorProfile?.companyName) {
-        return res.status(400).json({ message: 'Vendor requires vendorProfile.companyName.' });
+        throw createHttpError(400, 'Vendor requires vendorProfile.companyName.');
       }
       userData.vendorProfile = {
         companyName: vendorProfile.companyName,
@@ -46,9 +54,10 @@ router.post('/register', async (req, res) => {
 
     if (role === 'shipper') {
       if (!shipperProfile?.licenseNumber || !shipperProfile?.hub) {
-        return res
-          .status(400)
-          .json({ message: 'Shipper requires shipperProfile.licenseNumber and shipperProfile.hub.' });
+        throw createHttpError(
+          400,
+          'Shipper requires shipperProfile.licenseNumber and shipperProfile.hub.'
+        );
       }
       userData.shipperProfile = {
         licenseNumber: shipperProfile.licenseNumber,
@@ -69,67 +78,69 @@ router.post('/register', async (req, res) => {
     const user = new User(userData);
     await user.save();
 
-    req.session.userId = user._id.toString();
-    req.session.role = user.role;
+    req.session.user = {
+      id: user._id.toString(),
+      username: user.username,
+      role: user.role,
+    };
 
     return res.status(201).json({ id: user._id, username: user.username, role: user.role });
-  } catch (error) {
-    return res.status(500).json({ message: 'Failed to register user.', error: error.message });
-  }
-});
+  })
+);
 
-router.post('/login', async (req, res) => {
-  try {
+router.post(
+  '/login',
+  asyncWrap(async (req, res) => {
     const { username, password } = req.body;
 
     if (!username || !password) {
-      return res.status(400).json({ message: 'Username and password are required.' });
+      throw createHttpError(400, 'Username and password are required.');
     }
 
     const user = await User.findOne({ username });
     if (!user) {
-      return res.status(401).json({ message: 'Invalid credentials.' });
+      throw createHttpError(401, 'Invalid credentials.');
     }
 
     const passwordMatch = await bcrypt.compare(password, user.passwordHash);
     if (!passwordMatch) {
-      return res.status(401).json({ message: 'Invalid credentials.' });
+      throw createHttpError(401, 'Invalid credentials.');
     }
 
-    req.session.userId = user._id.toString();
-    req.session.role = user.role;
+    req.session.user = {
+      id: user._id.toString(),
+      username: user.username,
+      role: user.role,
+    };
 
     return res.json({ id: user._id, username: user.username, role: user.role });
-  } catch (error) {
-    return res.status(500).json({ message: 'Failed to login.', error: error.message });
-  }
-});
+  })
+);
 
-router.get('/me', async (req, res) => {
-  try {
-    if (!req.session.userId) {
-      return res.status(401).json({ message: 'Not authenticated.' });
+router.get(
+  '/me',
+  asyncWrap(async (req, res) => {
+    if (!req.session.user?.id) {
+      throw createHttpError(401, 'Not authenticated.');
     }
 
-    const user = await User.findById(req.session.userId).select('-passwordHash').lean();
+    const user = await User.findById(req.session.user.id).select('-passwordHash').lean();
     if (!user) {
-      return res.status(401).json({ message: 'Session invalid.' });
+      throw createHttpError(401, 'Session invalid.');
     }
 
     return res.json(user);
-  } catch (error) {
-    return res.status(500).json({ message: 'Failed to fetch user.', error: error.message });
-  }
-});
+  })
+);
 
-router.post('/logout', (req, res) => {
+router.post('/logout', (req, res, next) => {
   if (!req.session) {
     return res.status(204).end();
   }
 
   req.session.destroy((err) => {
     if (err) {
-      return res.status(500).json({ message: 'Failed to logout.' });
+      return next(err);
     }
 
     res.clearCookie('connect.sid');

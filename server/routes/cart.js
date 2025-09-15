@@ -5,6 +5,8 @@ const express = require('express');
 const DistributionHub = require('../models/DistributionHub');
 const Order = require('../models/Order');
 const Product = require('../models/Product');
+const asyncWrap = require('../middleware/asyncWrap');
+const { requireLogin } = require('../middleware/auth');
 
 const router = express.Router();
 
@@ -26,12 +28,12 @@ router.post('/items', (req, res) => {
   const { productId, quantity = 1 } = req.body;
 
   if (!productId) {
-    return res.status(400).json({ message: 'productId is required.' });
+    return res.status(400).json({ error: 'productId is required.' });
   }
 
   const parsedQuantity = Number.parseInt(quantity, 10);
   if (Number.isNaN(parsedQuantity) || parsedQuantity <= 0) {
-    return res.status(400).json({ message: 'Quantity must be a positive integer.' });
+    return res.status(400).json({ error: 'Quantity must be a positive integer.' });
   }
 
   const existingIndex = req.session.cart.findIndex((item) => item.productId === productId);
@@ -45,25 +47,31 @@ router.post('/items', (req, res) => {
 });
 
 // Checkout sketch: selects random hub, creates an order, and clears the cart.
-router.post('/checkout', async (req, res) => {
-  try {
-    const sessionCustomerId = req.session.userId;
+router.post(
+  '/checkout',
+  requireLogin,
+  asyncWrap(async (req, res) => {
+    const sessionCustomerId = req.session.user?.id;
     const bodyCustomerId = req.body?.customerId;
     const customerId = sessionCustomerId || bodyCustomerId;
 
     if (!customerId) {
-      return res
-        .status(401)
-        .json({ message: 'Authentication required. Provide customerId temporarily if testing without login.' });
+      const err = new Error('Authentication required.');
+      err.status = 401;
+      throw err;
     }
 
     if (!Array.isArray(req.session.cart) || req.session.cart.length === 0) {
-      return res.status(400).json({ message: 'Cart is empty.' });
+      const err = new Error('Cart is empty.');
+      err.status = 400;
+      throw err;
     }
 
     const hubSample = await DistributionHub.aggregate([{ $sample: { size: 1 } }]);
     if (!hubSample || hubSample.length === 0) {
-      return res.status(500).json({ message: 'No distribution hubs available.' });
+      const err = new Error('No distribution hubs available.');
+      err.status = 500;
+      throw err;
     }
 
     const distributionHub = hubSample[0];
@@ -72,7 +80,9 @@ router.post('/checkout', async (req, res) => {
     const products = await Product.find({ _id: { $in: productIds } }).lean();
 
     if (products.length !== req.session.cart.length) {
-      return res.status(400).json({ message: 'One or more products could not be found.' });
+      const err = new Error('One or more products could not be found.');
+      err.status = 400;
+      throw err;
     }
 
     const items = req.session.cart.map((item) => {
@@ -99,9 +109,7 @@ router.post('/checkout', async (req, res) => {
       orderId: order._id,
       hub: distributionHub,
     });
-  } catch (error) {
-    return res.status(500).json({ message: 'Checkout failed.', error: error.message });
-  }
-});
+  })
+);
 
 module.exports = router;

@@ -3,11 +3,13 @@
  */
 const express = require('express');
 const DistributionHub = require('../models/DistributionHub');
+const asyncWrap = require('../middleware/asyncWrap');
 
 const router = express.Router();
 
-router.post('/seed-hubs', async (req, res) => {
-  try {
+router.post(
+  '/seed-hubs',
+  asyncWrap(async (req, res) => {
     const existingCount = await DistributionHub.countDocuments();
     if (existingCount > 0) {
       const hubs = await DistributionHub.find().lean();
@@ -34,9 +36,7 @@ router.post('/seed-hubs', async (req, res) => {
 
     const created = await DistributionHub.insertMany(hubsToCreate);
     return res.status(201).json({ message: 'Distribution hubs seeded.', hubs: created });
-  } catch (error) {
-    return res.status(500).json({ message: 'Failed to seed hubs.', error: error.message });
-  }
-});
+  })
+);
 
 module.exports = router;
