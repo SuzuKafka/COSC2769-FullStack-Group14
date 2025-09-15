@@ -1,11 +1,15 @@
-import React, { useEffect, useState } from 'react';
-import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
+import React, { useEffect } from 'react';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import Header from './components/Header';
 import RequireAuth from './components/RequireAuth';
 import VendorAddProduct from './pages/VendorAddProduct';
 import VendorMyProducts from './pages/VendorMyProducts';
+import Browse from './pages/Browse';
+import ProductDetail from './pages/ProductDetail';
+import Cart from './pages/Cart';
 import { fetchCurrentUser } from './store/authSlice';
+import { getCart } from './store/cartSlice';
 
 const mainStyle = {
   minHeight: 'calc(100vh - 64px)',
@@ -14,48 +18,6 @@ const mainStyle = {
 
 const pageContainerStyle = {
   padding: '2rem',
-};
-
-const Home = () => {
-  const [message, setMessage] = useState('Loading...');
-  const [error, setError] = useState('');
-  const location = useLocation();
-  const bannerMessage = location.state?.message;
-
-  useEffect(() => {
-    fetch('/api/hello')
-      .then(async (res) => {
-        if (!res.ok) {
-          throw new Error(`Request failed with status ${res.status}`);
-        }
-        const data = await res.json();
-        setMessage(data.message || 'No message received');
-      })
-      .catch((err) => {
-        setError('Unable to reach server');
-        console.error(err);
-      });
-  }, []);
-
-  return (
-    <section style={pageContainerStyle}>
-      {bannerMessage && (
-        <div
-          style={{
-            marginBottom: '1rem',
-            padding: '0.75rem 1rem',
-            borderRadius: '6px',
-            backgroundColor: '#fee2e2',
-            color: '#991b1b',
-          }}
-        >
-          {bannerMessage}
-        </div>
-      )}
-      <h1>Welcome to the COSC2769 Marketplace</h1>
-      <p>Server says: {error ? error : message}</p>
-    </section>
-  );
 };
 
 const Login = () => (
@@ -70,6 +32,7 @@ const NotFound = () => <Navigate to="/" replace />;
 const AppContent = () => {
   const dispatch = useDispatch();
   const authStatus = useSelector((state) => state.auth.status);
+  const cartStatus = useSelector((state) => state.cart.status);
 
   useEffect(() => {
     if (authStatus === 'idle') {
@@ -77,13 +40,22 @@ const AppContent = () => {
     }
   }, [authStatus, dispatch]);
 
+  useEffect(() => {
+    if (cartStatus === 'idle') {
+      dispatch(getCart());
+    }
+  }, [cartStatus, dispatch]);
+
   return (
     <div>
       <Header />
       <main style={mainStyle}>
         <Routes>
-          <Route path="/" element={<Home />} />
+          <Route path="/" element={<Browse />} />
+          <Route path="/browse" element={<Browse />} />
           <Route path="/login" element={<Login />} />
+          <Route path="/product/:id" element={<ProductDetail />} />
+          <Route path="/cart" element={<Cart />} />
           <Route element={<RequireAuth allowedRoles={['vendor']} />}>
             <Route path="/vendor/new-product" element={<VendorAddProduct />} />
             <Route path="/vendor/my-products" element={<VendorMyProducts />} />

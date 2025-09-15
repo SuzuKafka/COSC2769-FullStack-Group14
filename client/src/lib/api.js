@@ -55,3 +55,25 @@ export async function apiFetchJson(path, options = {}) {
 
   return apiFetch(path, mergedOptions);
 }
+
+export function buildQueryString(params = {}) {
+  const searchParams = new URLSearchParams();
+
+  Object.entries(params).forEach(([key, value]) => {
+    if (value === undefined || value === null || value === '') {
+      return;
+    }
+    if (Array.isArray(value)) {
+      value.forEach((entry) => {
+        if (entry !== undefined && entry !== null && entry !== '') {
+          searchParams.append(key, entry);
+        }
+      });
+      return;
+    }
+    searchParams.append(key, value);
+  });
+
+  const queryString = searchParams.toString();
+  return queryString ? `?${queryString}` : '';
+}
