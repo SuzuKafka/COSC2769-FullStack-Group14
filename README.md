@@ -17,6 +17,11 @@
 - `client/` – React frontend bootstrapped with Vite.
 - `.gitignore` – Shared ignore rules for both frontend and backend environments.
 
+## Branching Strategy
+- `main` – stable, production-ready code.
+- `dev` – active development integration branch.
+- `feature/*` – short-lived branches per module (for example, `feature/auth`, `feature/cart`).
+
 ## Placeholders
 - **Test Accounts:** _TBD_
 - **Demo Video:** _TBD_
