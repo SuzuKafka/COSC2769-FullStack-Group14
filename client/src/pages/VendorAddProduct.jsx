@@ -111,6 +111,7 @@ const VendorAddProduct = () => {
   }, [formValues, imageFile]);
 
   const showErrors = touched;
+  const isSubmitting = createStatus === 'loading';
 
   const handleChange = (event) => {
     const { name, value } = event.target;
@@ -152,9 +153,6 @@ const VendorAddProduct = () => {
     <section style={formContainerStyle}>
       <h2 style={{ marginBottom: '1.5rem' }}>Add Product</h2>
       {successMessage && <div style={successStyle}>{successMessage}</div>}
-      {createStatus === 'failed' && createError && (
-        <div style={{ ...successStyle, backgroundColor: '#fee2e2', color: '#991b1b' }}>{createError}</div>
-      )}
       <form onSubmit={handleSubmit} noValidate>
         <label htmlFor="name" style={labelStyle}>
           Product Name
@@ -168,6 +166,7 @@ const VendorAddProduct = () => {
           style={inputStyle}
           placeholder="Premium Angus Burger"
           required
+          disabled={isSubmitting}
         />
         {showErrors && validationErrors.name && <p style={errorStyle}>{validationErrors.name}</p>}
 
@@ -185,6 +184,7 @@ const VendorAddProduct = () => {
           style={inputStyle}
           placeholder="129.90"
           required
+          disabled={isSubmitting}
         />
         {showErrors && validationErrors.price && <p style={errorStyle}>{validationErrors.price}</p>}
 
@@ -199,6 +199,7 @@ const VendorAddProduct = () => {
           onChange={handleChange}
           style={{ ...inputStyle, resize: 'vertical' }}
           placeholder="Limited time blend."
+          disabled={isSubmitting}
         />
         {showErrors && validationErrors.description && <p style={errorStyle}>{validationErrors.description}</p>}
 
@@ -213,11 +214,16 @@ const VendorAddProduct = () => {
           accept="image/*"
           onChange={handleFileChange}
           style={inputStyle}
+          disabled={isSubmitting}
         />
         {showErrors && validationErrors.image && <p style={errorStyle}>{validationErrors.image}</p>}
 
-        <button type="submit" style={buttonStyle} disabled={createStatus === 'loading'}>
-          {createStatus === 'loading' ? 'Submitting…' : 'Create Product'}
+        {createStatus === 'failed' && createError && (
+          <p style={{ ...errorStyle, marginTop: '0.5rem', marginBottom: '1.25rem' }}>{createError}</p>
+        )}
+
+        <button type="submit" style={buttonStyle} disabled={isSubmitting}>
+          {isSubmitting ? 'Submitting…' : 'Create Product'}
         </button>
       </form>
     </section>
