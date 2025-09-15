@@ -1,10 +1,12 @@
+/**
+ * Routes handling user authentication for the COSC2769 Full Stack project.
+ */
 const express = require('express');
 const bcrypt = require('bcrypt');
 const User = require('../models/User');
 
 const router = express.Router();
 
-// POST /api/auth/register
 router.post('/register', async (req, res) => {
   try {
     const { username, password, role } = req.body;
@@ -29,7 +31,6 @@ router.post('/register', async (req, res) => {
   }
 });
 
-// POST /api/auth/login
 router.post('/login', async (req, res) => {
   try {
     const { username, password } = req.body;

@@ -8,6 +8,7 @@ const authRouter = require('./routes/auth');
 dotenv.config();
 
 const app = express();
+const isDevelopment = process.env.NODE_ENV === 'development';
 
 app.use(cors({
   origin: 'http://localhost:3000',
@@ -16,6 +17,12 @@ app.use(cors({
 app.use(express.json());
 
 app.use('/api/auth', authRouter);
+
+if (isDevelopment) {
+  // Temporary seeding utilities accessible only in development.
+  const devRouter = require('./routes/dev');
+  app.use('/api/dev', devRouter);
+}
 
 app.get('/api/hello', (req, res) => {
   res.json({ message: 'Server running' });

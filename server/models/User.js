@@ -1,3 +1,6 @@
+/**
+ * Mongoose schema for platform users, handling role-specific profiles.
+ */
 const mongoose = require('mongoose');
 
 const { Schema } = mongoose;
