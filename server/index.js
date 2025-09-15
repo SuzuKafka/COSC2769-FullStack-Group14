@@ -3,6 +3,7 @@ const cors = require('cors');
 const mongoose = require('mongoose');
 const session = require('express-session');
 const MongoStore = require('connect-mongo');
+const path = require('path');
 const dotenv = require('dotenv');
 const authRouter = require('./routes/auth');
 const cartRouter = require('./routes/cart');
@@ -26,6 +27,7 @@ app.use(cors({
   credentials: true,
 }));
 app.use(express.json());
+app.use('/public', express.static(path.join(__dirname, 'public')));
 
 app.use(
   session({
@@ -47,7 +49,7 @@ app.use(
 
 app.use('/api/auth', authRouter);
 app.use('/api/cart', cartRouter);
-app.use('/api', productRouter);
+app.use('/api/products', productRouter);
 
 if (isDevelopment) {
   // Temporary seeding utilities accessible only in development.

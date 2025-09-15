@@ -48,7 +48,7 @@ const createHttpError = (status, message) => {
 };
 
 router.post(
-  '/products',
+  '/',
   requireRole('vendor'),
   upload.single('image'),
   asyncWrap(async (req, res) => {
@@ -90,16 +90,15 @@ router.post(
   })
 );
 
-router.get(
-  '/my-products',
-  requireRole('vendor'),
-  asyncWrap(async (req, res) => {
-    const products = await Product.find({ vendor: req.user.id })
-      .sort({ createdAt: -1 })
-      .lean();
+const listVendorProducts = asyncWrap(async (req, res) => {
+  const products = await Product.find({ vendor: req.user.id })
+    .sort({ createdAt: -1 })
+    .lean();
 
-    return res.json({ products });
-  })
-);
+  return res.json({ products });
+});
+
+router.get('/', requireRole('vendor'), listVendorProducts);
+router.get('/my-products', requireRole('vendor'), listVendorProducts);
 
 module.exports = router;
