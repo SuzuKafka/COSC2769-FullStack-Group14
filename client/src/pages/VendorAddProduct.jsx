@@ -153,6 +153,11 @@ const VendorAddProduct = () => {
     <section style={formContainerStyle}>
       <h2 style={{ marginBottom: '1.5rem' }}>Add Product</h2>
       {successMessage && <div style={successStyle}>{successMessage}</div>}
+      {createStatus === 'failed' && createError && (
+        <div style={{ ...successStyle, backgroundColor: '#fee2e2', color: '#b91c1c' }}>
+          {createError}
+        </div>
+      )}
       <form onSubmit={handleSubmit} noValidate>
         <label htmlFor="name" style={labelStyle}>
           Product Name
