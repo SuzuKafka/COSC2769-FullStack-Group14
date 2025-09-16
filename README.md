@@ -17,6 +17,10 @@
 - `client/` – React frontend bootstrapped with Vite.
 - `.gitignore` – Shared ignore rules for both frontend and backend environments.
 
+## Security Notes
+
+- **Why bcrypt?** We rely on `bcrypt` for password hashing because it is a battle-tested, adaptive hashing algorithm with built-in salting and configurable work factors. This makes it far more resilient against brute-force or rainbow-table attacks compared to general-purpose hashing functions, helping the project meet the password security requirements in the 2025B specification.
+
 ## Branching Strategy
 - `main` – stable, production-ready code.
 - `dev` – active development integration branch.

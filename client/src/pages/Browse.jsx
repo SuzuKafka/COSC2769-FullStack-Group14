@@ -27,7 +27,6 @@ const inputStyle = {
 const productsGridStyle = {
   display: 'grid',
   gap: '1.5rem',
-  gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
 };
 
 const cardStyle = {
@@ -173,7 +172,7 @@ const Browse = () => {
       {status === 'succeeded' && items.length === 0 && <p>No products found. Try updating your filters.</p>}
 
       {items.length > 0 && (
-        <div style={productsGridStyle}>
+        <div className="products-grid" style={productsGridStyle}>
           {items.map((product) => (
             <article key={product._id} style={cardStyle}>
               <Link to={`/product/${product._id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
