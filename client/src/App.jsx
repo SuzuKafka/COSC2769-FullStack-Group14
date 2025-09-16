@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import Header from './components/Header';
 import RequireAuth from './components/RequireAuth';
@@ -24,12 +24,22 @@ const pageContainerStyle = {
   padding: '2rem',
 };
 
-const Login = () => (
-  <section style={pageContainerStyle}>
-    <h2>Login</h2>
-    <p>Authentication UI coming soon. For now, log in using the backend routes.</p>
-  </section>
-);
+const Login = () => {
+  const location = useLocation();
+  const message = location.state?.message;
+
+  return (
+    <section style={pageContainerStyle}>
+      <h2>Login</h2>
+      {message && (
+        <p style={{ color: '#1d4ed8' }}>
+          {message}
+        </p>
+      )}
+      <p>Authentication UI coming soon. For now, log in using the backend routes.</p>
+    </section>
+  );
+};
 
 const NotFound = () => <Navigate to="/" replace />;
 

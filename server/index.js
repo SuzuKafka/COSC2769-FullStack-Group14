@@ -30,6 +30,10 @@ if (!MONGODB_URI) {
 const uploadsDir = path.join(__dirname, 'uploads');
 fs.mkdirSync(uploadsDir, { recursive: true });
 
+if (!isDevelopment) {
+  app.set('trust proxy', 1);
+}
+
 app.use(cors({
   origin: 'http://localhost:3000',
   credentials: true,

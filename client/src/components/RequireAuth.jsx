@@ -6,16 +6,28 @@ const RequireAuth = ({ allowedRoles }) => {
   const { user, status } = useSelector((state) => state.auth);
   const location = useLocation();
 
+  const buildRedirect = (message) => (
+    <Navigate
+      to="/login"
+      state={{
+        from: location,
+        message,
+      }}
+      replace
+    />
+  );
+
   if (status === 'idle' || status === 'loading') {
     return <p style={{ padding: '1rem' }}>Checking session...</p>;
   }
 
   if (!user) {
-    return <Navigate to="/login" state={{ from: location }} replace />;
+    return buildRedirect('Please log in to access this page.');
   }
 
   if (allowedRoles && !allowedRoles.includes(user.role)) {
-    return <Navigate to="/" state={{ message: 'Access denied for this area.' }} replace />;
+    const expectedRoles = allowedRoles.join(', ');
+    return buildRedirect(`This area requires one of the following roles: ${expectedRoles}.`);
   }
 
   return <Outlet />;
