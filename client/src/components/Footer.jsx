@@ -64,6 +64,18 @@ const Footer = () => (
         </Link>
       </section>
       <section style={columnStyle}>
+        <h3 style={headingStyle}>Get Started</h3>
+        <Link to="/register/customer" style={linkStyle}>
+          Register as Customer
+        </Link>
+        <Link to="/register/vendor" style={linkStyle}>
+          Register as Vendor
+        </Link>
+        <Link to="/register/shipper" style={linkStyle}>
+          Register as Shipper
+        </Link>
+      </section>
+      <section style={columnStyle}>
         <h3 style={headingStyle}>Credits</h3>
         <p style={{ margin: 0, lineHeight: 1.6 }}>
           UI inspired by Tailwind UI examples (tailwindui.com) and adapted for coursework submission.

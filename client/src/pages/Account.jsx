@@ -189,9 +189,13 @@ const Account = () => {
               <p style={{ color: '#475569' }}>
                 License #: {user.shipperProfile.licenseNumber || 'Not provided'}
               </p>
-              <p style={{ color: '#475569' }}>
-                Hub ID: {user.shipperProfile.hub || 'Not assigned'}
-              </p>
+              {user.shipperProfile.hub ? (
+                <p style={{ color: '#475569', margin: 0 }}>
+                  Hub: {user.shipperProfile.hub.name} – {user.shipperProfile.hub.address}
+                </p>
+              ) : (
+                <p style={{ color: '#475569' }}>Hub: Not assigned</p>
+              )}
             </section>
           )}
         </div>

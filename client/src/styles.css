@@ -124,6 +124,15 @@ a:focus-visible {
   cursor: pointer;
 }
 
+.site-header__link--danger {
+  background: linear-gradient(135deg, #dc2626, #b91c1c);
+  color: #fff;
+}
+
+.site-header__link--danger:hover {
+  background: linear-gradient(135deg, #ef4444, #dc2626);
+}
+
 .site-header__badge {
   display: inline-flex;
   align-items: center;

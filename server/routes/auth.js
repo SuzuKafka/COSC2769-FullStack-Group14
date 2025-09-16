@@ -215,9 +215,26 @@ router.get(
       throw createHttpError(401, 'Not authenticated.');
     }
 
-    const user = await User.findById(req.session.user.id).select('-passwordHash').lean();
+    const user = await User.findById(req.session.user.id)
+      .select('-passwordHash')
+      .populate({ path: 'shipperProfile.hub', select: 'name address' })
+      .lean();
     if (!user) {
       throw createHttpError(401, 'Session invalid.');
+    }
+
+    if (user.shipperProfile?.hub) {
+      const hubDoc = user.shipperProfile.hub;
+      user.shipperProfile = {
+        ...user.shipperProfile,
+        hub: hubDoc
+          ? {
+              id: hubDoc._id?.toString() || hubDoc.toString(),
+              name: hubDoc.name,
+              address: hubDoc.address,
+            }
+          : null,
+      };
     }
 
     return res.json(user);

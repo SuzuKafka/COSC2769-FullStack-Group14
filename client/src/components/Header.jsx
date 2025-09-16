@@ -56,9 +56,6 @@ const Header = () => {
         to: '/cart',
         badge: totalQty > 0 ? totalQty : null,
       },
-      { key: 'about', label: 'About', to: '/about' },
-      { key: 'help', label: 'Help', to: '/help' },
-      { key: 'privacy', label: 'Privacy', to: '/privacy' },
     ];
 
     if (user?.role === 'vendor') {
@@ -74,7 +71,7 @@ const Header = () => {
 
     if (user) {
       links.push({ key: 'account', label: 'My Account', to: '/account' });
-      links.push({ key: 'logout', label: 'Log Out', type: 'button' });
+      links.push({ key: 'logout', label: 'Log Out', type: 'button', variant: 'danger' });
     } else {
       links.push({ key: 'login', label: 'Login', to: '/login', highlight: true });
     }
@@ -131,7 +128,7 @@ const Header = () => {
                     type="button"
                     className={`site-header__link site-header__link--button ${
                       isActive ? 'site-header__link--active' : ''
-                    }`}
+                    } ${link.variant === 'danger' ? 'site-header__link--danger' : ''}`}
                     onClick={() => handleNavAction(link)}
                     disabled={loginStatus === 'loading'}
                   >
