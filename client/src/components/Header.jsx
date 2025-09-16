@@ -5,107 +5,158 @@
 // Author: Ryota Suzuki
 // ID: s4075375
 
-import React from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import React, { useEffect, useMemo, useState } from 'react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { logoutUser } from '../store/authSlice';
 
-const headerStyle = {
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'space-between',
-  padding: '1rem 2rem',
-  backgroundColor: '#1f2933',
-  color: '#fff',
-};
-
-const navStyle = {
-  display: 'flex',
-  gap: '1rem',
-};
-
-const linkStyle = {
-  color: '#fff',
-  textDecoration: 'none',
-};
-
-const badgeStyle = {
-  display: 'inline-flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  minWidth: '20px',
-  padding: '0 6px',
-  borderRadius: '999px',
-  backgroundColor: '#f97316',
-  color: '#fff',
-  fontSize: '0.75rem',
-  marginLeft: '0.4rem',
-};
-
-const buttonLinkStyle = {
-  ...linkStyle,
-  border: '1px solid rgba(255, 255, 255, 0.6)',
-  borderRadius: '999px',
-  padding: '0.35rem 0.9rem',
-};
-
+// Responsive navigation bar shown on every page. Collapses to a vertical menu on mobile.
 const Header = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const location = useLocation();
   const user = useSelector((state) => state.auth.user);
   const totalQty = useSelector((state) => state.cart.totalQty);
   const loginStatus = useSelector((state) => state.auth.loginStatus);
+
+  const [isMobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+
+    handleResize();
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  useEffect(() => {
+    if (!isMobile) {
+      setMobileMenuOpen(false);
+    }
+  }, [isMobile]);
+
+  useEffect(() => {
+    setMobileMenuOpen(false);
+  }, [location.pathname]);
 
   const handleLogout = async () => {
     await dispatch(logoutUser());
     navigate('/login');
   };
 
+  const navLinks = useMemo(() => {
+    const links = [
+      { key: 'browse', label: 'Browse', to: '/browse' },
+      {
+        key: 'cart',
+        label: 'Cart',
+        to: '/cart',
+        badge: totalQty > 0 ? totalQty : null,
+      },
+      { key: 'about', label: 'About', to: '/about' },
+      { key: 'help', label: 'Help', to: '/help' },
+      { key: 'privacy', label: 'Privacy', to: '/privacy' },
+    ];
+
+    if (user?.role === 'vendor') {
+      links.push(
+        { key: 'vendor-new', label: 'Add Product', to: '/vendor/new-product' },
+        { key: 'vendor-products', label: 'My Products', to: '/vendor/my-products' },
+      );
+    }
+
+    if (user?.role === 'shipper') {
+      links.push({ key: 'shipper-orders', label: 'Shipper Orders', to: '/shipper/orders' });
+    }
+
+    if (user) {
+      links.push({ key: 'account', label: 'My Account', to: '/account' });
+      links.push({ key: 'logout', label: 'Log Out', type: 'button' });
+    } else {
+      links.push({ key: 'login', label: 'Login', to: '/login', highlight: true });
+    }
+
+    return links;
+  }, [totalQty, user]);
+
+  const handleToggleMenu = () => {
+    setMobileMenuOpen((open) => !open);
+  };
+
+  const handleNavAction = (link) => {
+    if (link.type === 'button') {
+      handleLogout();
+    }
+    if (isMobile) {
+      setMobileMenuOpen(false);
+    }
+  };
+
   return (
-    <header style={headerStyle}>
-      <Link to="/" style={{ ...linkStyle, fontWeight: 600 }}>COSC2769</Link>
-      <nav style={navStyle}>
-        <Link to="/" style={linkStyle}>
-          Browse
+    <header className="site-header">
+      <div className="site-header__top">
+        <Link to="/" className="site-header__brand">
+          <span className="site-header__logo" aria-hidden="true">
+            COSC
+          </span>
+          <span>COSC2769 Marketplace</span>
         </Link>
-        <Link to="/cart" style={linkStyle}>
-          Cart
-          {totalQty > 0 && <span style={badgeStyle}>{totalQty}</span>}
-        </Link>
-        {user?.role === 'vendor' && (
-          <>
-            <Link to="/vendor/new-product" style={linkStyle}>
-              Add Product
-            </Link>
-            <Link to="/vendor/my-products" style={linkStyle}>
-              My Products
-            </Link>
-          </>
-        )}
-        {user?.role === 'shipper' && (
-          <Link to="/shipper/orders" style={linkStyle}>
-            Shipper Orders
-          </Link>
-        )}
-        {user ? (
-          <>
-            <Link to="/account" style={linkStyle}>
-              My Account
-            </Link>
-            <button
-              type="button"
-              style={{ ...buttonLinkStyle, background: 'transparent' }}
-              onClick={handleLogout}
-              disabled={loginStatus === 'loading'}
-            >
-              {loginStatus === 'loading' ? 'Logging out…' : 'Log Out'}
-            </button>
-          </>
-        ) : (
-          <Link to="/login" style={buttonLinkStyle}>
-            Login
-          </Link>
-        )}
+        <button
+          type="button"
+          className="site-header__toggle"
+          aria-label="Toggle navigation"
+          aria-expanded={isMobileMenuOpen}
+          onClick={handleToggleMenu}
+        >
+          <span />
+          <span />
+          <span />
+        </button>
+      </div>
+      <nav
+        className={`site-header__nav ${
+          isMobile ? 'site-header__nav--mobile' : 'site-header__nav--desktop'
+        } ${isMobileMenuOpen ? 'site-header__nav--open' : ''}`}
+      >
+        <ul>
+          {navLinks.map((link) => {
+            const isActive = link.to && location.pathname.startsWith(link.to);
+            if (link.type === 'button') {
+              return (
+                <li key={link.key}>
+                  <button
+                    type="button"
+                    className={`site-header__link site-header__link--button ${
+                      isActive ? 'site-header__link--active' : ''
+                    }`}
+                    onClick={() => handleNavAction(link)}
+                    disabled={loginStatus === 'loading'}
+                  >
+                    {loginStatus === 'loading' ? 'Logging out…' : link.label}
+                  </button>
+                </li>
+              );
+            }
+
+            return (
+              <li key={link.key}>
+                <Link
+                  to={link.to}
+                  className={`site-header__link ${isActive ? 'site-header__link--active' : ''} ${
+                    link.highlight ? 'site-header__link--highlight' : ''
+                  }`}
+                  onClick={() => handleNavAction(link)}
+                >
+                  <span>{link.label}</span>
+                  {link.badge && <span className="site-header__badge">{link.badge}</span>}
+                </Link>
+              </li>
+            );
+          })}
+        </ul>
       </nav>
     </header>
   );
