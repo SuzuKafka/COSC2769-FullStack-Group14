@@ -111,8 +111,7 @@ const ShipperOrders = () => {
       )}
 
       {orders.map((order) => {
-        const itemCount =
-          order.items?.reduce((sum, item) => sum + (item.quantity || item.qty || 0), 0) || 0;
+        const itemCount = order.items?.reduce((sum, item) => sum + (item.quantity || 0), 0) || 0;
         return (
           <article key={order._id} style={cardStyle}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
@@ -121,6 +120,19 @@ const ShipperOrders = () => {
                 <p style={{ color: '#475569', margin: 0 }}>Placed: {formatDateTime(order.createdAt)}</p>
                 <p style={{ color: '#475569', margin: 0 }}>Items: {itemCount}</p>
                 <p style={{ color: '#475569', margin: 0 }}>Total: ${Number(order.total || 0).toFixed(2)}</p>
+                {order.customer && (
+                  <p style={{ color: '#475569', margin: 0 }}>
+                    Customer: {order.customer.username || order.customer.id}
+                  </p>
+                )}
+                {order.customer?.address && (
+                  <p style={{ color: '#475569', margin: 0 }}>Deliver to: {order.customer.address}</p>
+                )}
+                {order.hub && (
+                  <p style={{ color: '#475569', margin: 0 }}>
+                    Hub: {order.hub.name} – {order.hub.address}
+                  </p>
+                )}
               </div>
               <button
                 type="button"
@@ -135,17 +147,20 @@ const ShipperOrders = () => {
               <div style={lineItemsStyle}>
                 <ul style={{ listStyle: 'none', margin: 0, padding: 0 }}>
                   {order.items.map((item, index) => {
-                    const quantity = item.quantity || item.qty || 0;
+                    const quantity = item.quantity || 0;
                     return (
                       <li
-                        key={`${order._id}-item-${item.product || index}`}
+                        key={`${order._id}-item-${item.productId || index}`}
                         style={{ marginBottom: '0.5rem' }}
                       >
-                        <strong>{item.name || item.product}</strong> × {quantity}
+                        <strong>{item.name}</strong> × {quantity}
                         {item.priceAtPurchase && (
                           <span style={{ marginLeft: '0.5rem', color: '#64748b' }}>
                             @ ${Number(item.priceAtPurchase).toFixed(2)}
                           </span>
+                        )}
+                        {item.description && (
+                          <p style={{ margin: '0.25rem 0 0', color: '#64748b' }}>{item.description}</p>
                         )}
                       </li>
                     );

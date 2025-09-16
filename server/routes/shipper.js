@@ -40,10 +40,42 @@ router.get(
       status: 'active',
       distributionHub: hubObjectId,
     })
+      .populate({
+        path: 'customer',
+        select: 'username profileImagePath customerProfile.name customerProfile.defaultAddress',
+      })
+      .populate({ path: 'items.product', select: 'name description' })
+      .populate({ path: 'distributionHub', select: 'name address' })
       .sort({ createdAt: -1 })
       .lean();
 
-    return res.json({ ok: true, hubId, orders });
+    const mappedOrders = orders.map((order) => ({
+      ...order,
+      customer: order.customer
+        ? {
+            id: order.customer._id.toString(),
+            username: order.customer.username,
+            name: order.customer.customerProfile?.name,
+            address: order.customer.customerProfile?.defaultAddress,
+          }
+        : null,
+      hub: order.distributionHub
+        ? {
+            id: order.distributionHub._id.toString(),
+            name: order.distributionHub.name,
+            address: order.distributionHub.address,
+          }
+        : null,
+      items: order.items?.map((item) => ({
+        productId: item.product && item.product._id ? item.product._id.toString() : item.product?.toString(),
+        name: item.product?.name || item.name || 'Unknown product',
+        description: item.product?.description,
+        quantity: item.quantity,
+        priceAtPurchase: item.priceAtPurchase,
+      })),
+    }));
+
+    return res.json({ ok: true, hubId, orders: mappedOrders });
   })
 );
 
