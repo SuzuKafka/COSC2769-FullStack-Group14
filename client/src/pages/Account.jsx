@@ -117,6 +117,7 @@ const Account = () => {
     );
   }
 
+  // Prefer freshly uploaded preview; otherwise derive absolute URL for stored asset.
   const resolvedProfileImage = useMemo(() => {
     if (!user?.profileImagePath) {
       return null;

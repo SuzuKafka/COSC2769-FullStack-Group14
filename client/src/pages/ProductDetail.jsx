@@ -38,6 +38,7 @@ const buttonStyle = {
   fontWeight: 600,
 };
 
+// Shows a single product with configurable quantity and cart integration.
 const ProductDetail = () => {
   const { id } = useParams();
   const dispatch = useDispatch();

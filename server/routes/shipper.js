@@ -64,6 +64,7 @@ router.get(
       .sort({ createdAt: -1 })
       .lean();
 
+    // Flatten populated refs so the client receives ready-to-render JSON.
     const mappedOrders = orders.map((order) => ({
       ...order,
       customer: order.customer

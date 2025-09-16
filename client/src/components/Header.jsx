@@ -47,6 +47,7 @@ const Header = () => {
     navigate('/login');
   };
 
+  // Build navigation entries based on the current role/session state.
   const navLinks = useMemo(() => {
     const links = [
       { key: 'browse', label: 'Browse', to: '/browse' },

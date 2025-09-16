@@ -17,6 +17,7 @@ const { requireLogin } = require('../middleware/auth');
 
 const router = express.Router();
 
+// Normalize session cart entries to a consistent shape before manipulating quantities.
 const ensureCartShape = (cart) =>
   Array.isArray(cart)
     ? cart.map((item) => ({

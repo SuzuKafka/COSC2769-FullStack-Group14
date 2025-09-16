@@ -162,6 +162,7 @@ const Login = () => {
   );
 };
 
+// Routes guarded by header/footer and responsible for initial auth/cart hydration.
 const AppContent = () => {
   const dispatch = useDispatch();
   const authStatus = useSelector((state) => state.auth.status);

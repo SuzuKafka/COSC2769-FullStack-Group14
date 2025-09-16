@@ -93,16 +93,17 @@ router.post(
     }
 
     const passwordHash = await bcrypt.hash(password, 10);
-    const userData = {
-      username: trimmedUsername,
-      passwordHash,
-      role: trimmedRole,
-    };
+  const userData = {
+    username: trimmedUsername,
+    passwordHash,
+    role: trimmedRole,
+  };
 
-    if (!req.file) {
-      throw createHttpError(400, 'Profile image is required.');
-    }
-    userData.profileImagePath = `/uploads/${req.file.filename}`;
+  if (!req.file) {
+    throw createHttpError(400, 'Profile image is required.');
+  }
+  // Store only the generated filename; static middleware exposes /uploads publicly.
+  userData.profileImagePath = `/uploads/${req.file.filename}`;
 
     if (trimmedRole === 'vendor') {
       const companyName = ensureMinLength(req.body.vendorCompanyName, 'vendorProfile.companyName');

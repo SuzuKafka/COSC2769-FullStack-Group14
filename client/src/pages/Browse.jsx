@@ -80,6 +80,7 @@ const paginationStyle = {
   marginTop: '2rem',
 };
 
+// Catalog grid supporting server-side query filters and responsive layout.
 const Browse = () => {
   const dispatch = useDispatch();
   const { items, status, error, pagination } = useSelector((state) => state.catalog);

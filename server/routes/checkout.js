@@ -34,6 +34,7 @@ const pickRandomHub = (hubs) => {
     return null;
   }
 
+  // Uniformly pick one hub so orders spread across the seeded distribution network.
   const index = Math.floor(Math.random() * hubs.length);
   return hubs[index];
 };
