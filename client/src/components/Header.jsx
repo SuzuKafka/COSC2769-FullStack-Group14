@@ -64,9 +64,13 @@ const Header = () => {
             Shipper Orders
           </Link>
         )}
-        {user && (
+        {user ? (
           <Link to="/account" style={linkStyle}>
             My Account
+          </Link>
+        ) : (
+          <Link to="/login" style={linkStyle}>
+            Login
           </Link>
         )}
       </nav>

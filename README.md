@@ -54,6 +54,10 @@ Before testing, ensure your MongoDB Atlas cluster accepts connections from all m
    - Add items to the cart and proceed through checkout (cart should clear, confirmation should show hub name).
    - Log in as a shipper and open `/shipper/orders`; set an order to delivered/canceled and confirm it disappears.
 
+### UI Verification
+- Direct-load three routes (for example `/`, `/cart`, `/vendor/my-products`) in fresh tabs to confirm the header renders on every page and switches between `Login` (logged out) and `My Account` (after signing in).
+- Use browser dev tools device presets to inspect the Browse product grid: Desktop ≥1024 px displays 3 columns, Tablet 768–1023 px shows 2 columns, and Phone ≤767 px collapses to 1 column. Capture screenshots if your submission requires evidence.
+
 ## Project Structure
 - `server/` – Node.js + Express backend (`index.js` entry point).
 - `client/` – React frontend bootstrapped with Vite.
@@ -62,6 +66,8 @@ Before testing, ensure your MongoDB Atlas cluster accepts connections from all m
 ## Security Notes
 
 - **Why bcrypt?** We rely on `bcrypt` for password hashing because it is a battle-tested, adaptive hashing algorithm with built-in salting and configurable work factors. This makes it far more resilient against brute-force or rainbow-table attacks compared to general-purpose hashing functions, helping the project meet the password security requirements in the 2025B specification.
+- **Environment configuration:** Copy `server/.env.example` to `server/.env` and fill in the values before running the server. The backend loads configuration via `dotenv`, so production secrets stay out of source control.
+- **Session cookies:** The Express session is stored in MongoDB with `httpOnly` cookies by default and toggles the `secure` flag automatically when `NODE_ENV` is not `development`, keeping cookies HTTPS-only in production. CORS is limited to `http://localhost:3000` for the development client.
 
 ## Branching Strategy
 - `main` – stable, production-ready code.
