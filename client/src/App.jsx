@@ -1,5 +1,5 @@
-import React, { useEffect } from 'react';
-import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { BrowserRouter, Routes, Route, useLocation, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import Header from './components/Header';
 import Footer from './components/Footer';
@@ -15,7 +15,7 @@ import ShipperOrders from './pages/ShipperOrders';
 import Account from './pages/Account';
 import Forbidden from './pages/Forbidden';
 import NotFound from './pages/NotFound';
-import { fetchCurrentUser } from './store/authSlice';
+import { fetchCurrentUser, loginUser, clearLoginState } from './store/authSlice';
 import { getCart } from './store/cartSlice';
 
 const mainStyle = {
@@ -29,17 +29,108 @@ const pageContainerStyle = {
 
 const Login = () => {
   const location = useLocation();
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const { loginStatus, loginError, user } = useSelector((state) => state.auth);
   const message = location.state?.message;
+  const redirectPath = location.state?.from?.pathname || '/';
+
+  const [formValues, setFormValues] = useState({ username: '', password: '' });
+  const [touched, setTouched] = useState(false);
+
+  useEffect(() => {
+    return () => {
+      dispatch(clearLoginState());
+    };
+  }, [dispatch]);
+
+  useEffect(() => {
+    if (user) {
+      navigate(redirectPath, { replace: true });
+    }
+  }, [user, navigate, redirectPath]);
+
+  const handleChange = (event) => {
+    const { name, value } = event.target;
+    setFormValues((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+    setTouched(true);
+    if (!formValues.username.trim() || !formValues.password.trim()) {
+      return;
+    }
+    await dispatch(loginUser(formValues));
+  };
+
+  const disabled = loginStatus === 'loading';
+  const showValidation = touched && (!formValues.username.trim() || !formValues.password.trim());
 
   return (
     <section style={pageContainerStyle}>
       <h2>Login</h2>
-      {message && (
-        <p style={{ color: '#1d4ed8' }}>
-          {message}
-        </p>
-      )}
-      <p>Authentication UI coming soon. For now, log in using the backend routes.</p>
+      {message && <p style={{ color: '#1d4ed8' }}>{message}</p>}
+      <form
+        onSubmit={handleSubmit}
+        style={{ maxWidth: '420px', marginTop: '1.5rem', display: 'grid', gap: '1rem' }}
+      >
+        <label htmlFor="username" style={{ fontWeight: 600 }}>
+          Username
+        </label>
+        <input
+          id="username"
+          name="username"
+          type="text"
+          value={formValues.username}
+          onChange={handleChange}
+          placeholder="vendordemo"
+          style={{ padding: '0.75rem', borderRadius: '8px', border: '1px solid #cbd5f5' }}
+          disabled={disabled}
+          autoComplete="username"
+        />
+        {showValidation && !formValues.username.trim() && (
+          <p style={{ color: '#b91c1c', marginTop: '-0.5rem' }}>Username is required.</p>
+        )}
+
+        <label htmlFor="password" style={{ fontWeight: 600 }}>
+          Password
+        </label>
+        <input
+          id="password"
+          name="password"
+          type="password"
+          value={formValues.password}
+          onChange={handleChange}
+          placeholder="Password123"
+          style={{ padding: '0.75rem', borderRadius: '8px', border: '1px solid #cbd5f5' }}
+          disabled={disabled}
+          autoComplete="current-password"
+        />
+        {showValidation && !formValues.password.trim() && (
+          <p style={{ color: '#b91c1c', marginTop: '-0.5rem' }}>Password is required.</p>
+        )}
+
+        {loginError && (
+          <p style={{ color: '#b91c1c', marginTop: '-0.5rem' }}>{loginError}</p>
+        )}
+
+        <button
+          type="submit"
+          style={{
+            padding: '0.9rem',
+            borderRadius: '8px',
+            border: 'none',
+            backgroundColor: '#2563eb',
+            color: '#fff',
+            fontWeight: 600,
+            cursor: 'pointer',
+          }}
+          disabled={disabled}
+        >
+          {disabled ? 'Signing in…' : 'Sign In'}
+        </button>
+      </form>
     </section>
   );
 };

@@ -1,5 +1,5 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import { apiFetch } from '../lib/api';
+import { apiFetch, apiFetchJson } from '../lib/api';
 
 export const fetchCurrentUser = createAsyncThunk(
   'auth/fetchCurrentUser',
@@ -39,6 +39,33 @@ export const uploadProfileImage = createAsyncThunk(
   }
 );
 
+export const loginUser = createAsyncThunk(
+  'auth/loginUser',
+  async ({ username, password }, { rejectWithValue }) => {
+    try {
+      const data = await apiFetchJson('/api/auth/login', {
+        method: 'POST',
+        body: JSON.stringify({ username, password }),
+      });
+      return data;
+    } catch (error) {
+      return rejectWithValue({ message: error.message || 'Login failed.' });
+    }
+  }
+);
+
+export const logoutUser = createAsyncThunk(
+  'auth/logoutUser',
+  async (_, { rejectWithValue }) => {
+    try {
+      await apiFetch('/api/auth/logout', { method: 'POST' });
+      return true;
+    } catch (error) {
+      return rejectWithValue({ message: error.message || 'Logout failed.' });
+    }
+  }
+);
+
 const authSlice = createSlice({
   name: 'auth',
   initialState: {
@@ -47,6 +74,8 @@ const authSlice = createSlice({
     error: null,
     profileUploadStatus: 'idle',
     profileUploadError: null,
+    loginStatus: 'idle',
+    loginError: null,
   },
   reducers: {
     setUser(state, action) {
@@ -60,6 +89,10 @@ const authSlice = createSlice({
     resetProfileUpload(state) {
       state.profileUploadStatus = 'idle';
       state.profileUploadError = null;
+    },
+    clearLoginState(state) {
+      state.loginStatus = 'idle';
+      state.loginError = null;
     },
   },
   extraReducers: (builder) => {
@@ -98,10 +131,36 @@ const authSlice = createSlice({
       .addCase(uploadProfileImage.rejected, (state, action) => {
         state.profileUploadStatus = 'failed';
         state.profileUploadError = action.payload?.message || action.error.message;
+      })
+      .addCase(loginUser.pending, (state) => {
+        state.loginStatus = 'loading';
+        state.loginError = null;
+      })
+      .addCase(loginUser.fulfilled, (state, action) => {
+        state.loginStatus = 'succeeded';
+        state.loginError = null;
+        state.user = action.payload;
+        state.status = 'succeeded';
+      })
+      .addCase(loginUser.rejected, (state, action) => {
+        state.loginStatus = 'failed';
+        state.loginError = action.payload?.message || action.error.message;
+      })
+      .addCase(logoutUser.pending, (state) => {
+        state.loginStatus = 'loading';
+      })
+      .addCase(logoutUser.fulfilled, (state) => {
+        state.user = null;
+        state.status = 'unauthenticated';
+        state.loginStatus = 'idle';
+      })
+      .addCase(logoutUser.rejected, (state, action) => {
+        state.loginStatus = 'failed';
+        state.loginError = action.payload?.message || action.error.message;
       });
   },
 });
 
-export const { setUser, clearAuthError, resetProfileUpload } = authSlice.actions;
+export const { setUser, clearAuthError, resetProfileUpload, clearLoginState } = authSlice.actions;
 
 export default authSlice.reducer;

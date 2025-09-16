@@ -1,6 +1,7 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
-import { useSelector } from 'react-redux';
+import { Link, useNavigate } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
+import { logoutUser } from '../store/authSlice';
 
 const headerStyle = {
   display: 'flex',
@@ -34,9 +35,24 @@ const badgeStyle = {
   marginLeft: '0.4rem',
 };
 
+const buttonLinkStyle = {
+  ...linkStyle,
+  border: '1px solid rgba(255, 255, 255, 0.6)',
+  borderRadius: '999px',
+  padding: '0.35rem 0.9rem',
+};
+
 const Header = () => {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
   const user = useSelector((state) => state.auth.user);
   const totalQty = useSelector((state) => state.cart.totalQty);
+  const loginStatus = useSelector((state) => state.auth.loginStatus);
+
+  const handleLogout = async () => {
+    await dispatch(logoutUser());
+    navigate('/login');
+  };
 
   return (
     <header style={headerStyle}>
@@ -65,11 +81,21 @@ const Header = () => {
           </Link>
         )}
         {user ? (
-          <Link to="/account" style={linkStyle}>
-            My Account
-          </Link>
+          <>
+            <Link to="/account" style={linkStyle}>
+              My Account
+            </Link>
+            <button
+              type="button"
+              style={{ ...buttonLinkStyle, background: 'transparent' }}
+              onClick={handleLogout}
+              disabled={loginStatus === 'loading'}
+            >
+              {loginStatus === 'loading' ? 'Logging out…' : 'Log Out'}
+            </button>
+          </>
         ) : (
-          <Link to="/login" style={linkStyle}>
+          <Link to="/login" style={buttonLinkStyle}>
             Login
           </Link>
         )}
