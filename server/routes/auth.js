@@ -3,7 +3,9 @@
  */
 const express = require('express');
 const bcrypt = require('bcrypt');
+const mongoose = require('mongoose');
 const User = require('../models/User');
+const DistributionHub = require('../models/DistributionHub');
 const asyncWrap = require('../middleware/asyncWrap');
 
 const createHttpError = (status, message) => {
@@ -13,6 +15,15 @@ const createHttpError = (status, message) => {
 };
 
 const router = express.Router();
+
+const PASSWORD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,20}$/;
+
+const ensureMinLength = (value, fieldName, min = 5) => {
+  if (!value || value.trim().length < min) {
+    throw createHttpError(400, `${fieldName} must be at least ${min} characters.`);
+  }
+  return value.trim();
+};
 
 router.post(
   '/register',
@@ -30,6 +41,13 @@ router.post(
       throw createHttpError(400, 'Username, password, and role are required.');
     }
 
+    if (!PASSWORD_REGEX.test(password)) {
+      throw createHttpError(
+        400,
+        'Password must be 8-20 characters and include upper, lower, digit, and !@#$%^&*.'
+      );
+    }
+
     const existingUser = await User.findOne({ username });
     if (existingUser) {
       throw createHttpError(409, 'Username already taken.');
@@ -43,29 +61,46 @@ router.post(
     };
 
     if (role === 'vendor') {
-      if (!vendorProfile?.companyName) {
-        throw createHttpError(400, 'Vendor requires vendorProfile.companyName.');
-      }
+      const companyName = ensureMinLength(
+        vendorProfile?.companyName,
+        'vendorProfile.companyName'
+      );
       userData.vendorProfile = {
-        companyName: vendorProfile.companyName,
+        companyName,
         contactEmail: vendorProfile.contactEmail,
       };
     }
 
     if (role === 'shipper') {
-      if (!shipperProfile?.licenseNumber || !shipperProfile?.hub) {
+      const licenseNumber = ensureMinLength(
+        shipperProfile?.licenseNumber,
+        'shipperProfile.licenseNumber'
+      );
+
+      if (!shipperProfile?.hub) {
         throw createHttpError(
           400,
-          'Shipper requires shipperProfile.licenseNumber and shipperProfile.hub.'
+          'Shipper requires shipperProfile.hub.'
         );
       }
+      if (!mongoose.Types.ObjectId.isValid(shipperProfile.hub)) {
+        throw createHttpError(400, 'shipperProfile.hub must be a valid id.');
+      }
+
+      const hubExists = await DistributionHub.exists({ _id: shipperProfile.hub });
+      if (!hubExists) {
+        throw createHttpError(400, 'Selected hub does not exist.');
+      }
       userData.shipperProfile = {
-        licenseNumber: shipperProfile.licenseNumber,
+        licenseNumber,
         hub: shipperProfile.hub,
       };
     }
 
     if (role === 'customer' && customerProfile) {
+      if (customerProfile.defaultAddress) {
+        ensureMinLength(customerProfile.defaultAddress, 'customerProfile.defaultAddress');
+      }
       userData.customerProfile = {
         defaultAddress: customerProfile.defaultAddress,
       };
@@ -85,6 +120,14 @@ router.post(
     };
 
     return res.status(201).json({ id: user._id, username: user.username, role: user.role });
+  })
+);
+
+router.get(
+  '/hubs',
+  asyncWrap(async (req, res) => {
+    const hubs = await DistributionHub.find().select('name address').sort({ name: 1 }).lean();
+    return res.json({ hubs });
   })
 );
 
