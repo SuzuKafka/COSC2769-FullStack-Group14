@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useParams } from 'react-router-dom';
 import { fetchProduct, clearProduct } from '../store/catalogSlice';
@@ -37,6 +37,26 @@ const ProductDetail = () => {
   const { product, productStatus, productError } = useSelector((state) => state.catalog);
   const { lastActionStatus } = useSelector((state) => state.cart);
   const [quantity, setQuantity] = useState(1);
+
+  const assetBaseUrl = useMemo(() => {
+    if (typeof window === 'undefined') {
+      return '';
+    }
+    if (import.meta.env.DEV) {
+      return 'http://localhost:4000';
+    }
+    return '';
+  }, []);
+
+  const resolveImagePath = (path) => {
+    if (!path) {
+      return null;
+    }
+    if (/^https?:\/\//i.test(path)) {
+      return path;
+    }
+    return `${assetBaseUrl}/public${path}`;
+  };
 
   useEffect(() => {
     if (id) {
@@ -77,7 +97,7 @@ const ProductDetail = () => {
   return (
     <section style={containerStyle}>
       {product.imagePath ? (
-        <img src={`/public${product.imagePath}`} alt={product.name} style={imageStyle} />
+        <img src={resolveImagePath(product.imagePath)} alt={product.name} style={imageStyle} />
       ) : (
         <div style={{ ...imageStyle, height: '100%' }} />
       )}

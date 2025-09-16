@@ -18,7 +18,7 @@ const accountRouter = require('./routes/account');
 dotenv.config();
 
 const app = express();
-const isDevelopment = process.env.NODE_ENV === 'development';
+const isDevelopment = process.env.NODE_ENV !== 'production';
 const MONGODB_URI = process.env.MONGODB_URI;
 const SESSION_SECRET = process.env.SESSION_SECRET || 'development_secret';
 const PORT = process.env.PORT || 4000;

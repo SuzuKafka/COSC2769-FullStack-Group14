@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { uploadProfileImage, resetProfileUpload } from '../store/authSlice';
 
@@ -45,6 +45,17 @@ const Account = () => {
   const { user, profileUploadStatus, profileUploadError } = useSelector((state) => state.auth);
   const [selectedFile, setSelectedFile] = useState(null);
   const [previewUrl, setPreviewUrl] = useState(null);
+
+  const uploadsBaseUrl = useMemo(() => {
+    if (typeof window === 'undefined') {
+      return '';
+    }
+    const { origin } = window.location;
+    if (origin.includes('localhost:3000')) {
+      return 'http://localhost:4000';
+    }
+    return '';
+  }, []);
 
   useEffect(() => {
     dispatch(resetProfileUpload());
@@ -99,7 +110,17 @@ const Account = () => {
     );
   }
 
-  const imageSrc = previewUrl || user.profileImagePath;
+  const resolvedProfileImage = useMemo(() => {
+    if (!user?.profileImagePath) {
+      return null;
+    }
+    if (/^https?:\/\//i.test(user.profileImagePath)) {
+      return user.profileImagePath;
+    }
+    return `${uploadsBaseUrl}${user.profileImagePath}`;
+  }, [uploadsBaseUrl, user?.profileImagePath]);
+
+  const imageSrc = previewUrl || resolvedProfileImage;
   const isUploading = profileUploadStatus === 'loading';
 
   return (

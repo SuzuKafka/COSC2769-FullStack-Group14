@@ -12,7 +12,7 @@ const containerStyle = {
 
 const filtersStyle = {
   display: 'grid',
-  gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))',
+  gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
   gap: '1rem',
   marginBottom: '1.5rem',
 };
@@ -22,6 +22,7 @@ const inputStyle = {
   padding: '0.6rem 0.75rem',
   borderRadius: '6px',
   border: '1px solid #cbd5f5',
+  boxSizing: 'border-box',
 };
 
 const productsGridStyle = {
@@ -76,6 +77,26 @@ const Browse = () => {
   const dispatch = useDispatch();
   const { items, status, error, pagination } = useSelector((state) => state.catalog);
   const { lastActionStatus } = useSelector((state) => state.cart);
+
+  const assetBaseUrl = useMemo(() => {
+    if (typeof window === 'undefined') {
+      return '';
+    }
+    if (import.meta.env.DEV) {
+      return 'http://localhost:4000';
+    }
+    return '';
+  }, []);
+
+  const resolveImagePath = (path) => {
+    if (!path) {
+      return null;
+    }
+    if (/^https?:\/\//i.test(path)) {
+      return path;
+    }
+    return `${assetBaseUrl}/public${path}`;
+  };
 
   const [searchInput, setSearchInput] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
@@ -178,7 +199,7 @@ const Browse = () => {
               <Link to={`/product/${product._id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
                 {product.imagePath ? (
                   <img
-                    src={`/public${product.imagePath}`}
+                    src={resolveImagePath(product.imagePath)}
                     alt={product.name}
                     style={imageStyle}
                     loading="lazy"
