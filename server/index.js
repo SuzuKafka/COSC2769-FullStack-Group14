@@ -4,11 +4,15 @@ const mongoose = require('mongoose');
 const session = require('express-session');
 const MongoStore = require('connect-mongo');
 const path = require('path');
+const fs = require('fs');
 const dotenv = require('dotenv');
 const authRouter = require('./routes/auth');
 const cartRouter = require('./routes/cart');
+const checkoutRouter = require('./routes/checkout');
 const productRouter = require('./routes/products');
 const catalogRouter = require('./routes/catalog');
+const shipperRouter = require('./routes/shipper');
+const accountRouter = require('./routes/account');
 
 // Load environment variables
 dotenv.config();
@@ -23,12 +27,16 @@ if (!MONGODB_URI) {
   throw new Error('MONGODB_URI is not defined.');
 }
 
+const uploadsDir = path.join(__dirname, 'uploads');
+fs.mkdirSync(uploadsDir, { recursive: true });
+
 app.use(cors({
   origin: 'http://localhost:3000',
   credentials: true,
 }));
 app.use(express.json());
 app.use('/public', express.static(path.join(__dirname, 'public')));
+app.use('/uploads', express.static(uploadsDir));
 
 app.use(
   session({
@@ -50,8 +58,11 @@ app.use(
 
 app.use('/api/auth', authRouter);
 app.use('/api/cart', cartRouter);
+app.use('/api/checkout', checkoutRouter);
 app.use('/api/products', productRouter);
 app.use('/api/catalog', catalogRouter);
+app.use('/api/shipper', shipperRouter);
+app.use('/api/account', accountRouter);
 
 if (isDevelopment) {
   // Temporary seeding utilities accessible only in development.
