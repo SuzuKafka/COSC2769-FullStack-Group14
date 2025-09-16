@@ -1,3 +1,10 @@
+// RMIT University Vietnam
+// Course: COSC2769 - Full Stack Development
+// Semester: 2025B
+// Assessment: Assignment 02
+// Author: Ryota Suzuki
+// ID: s4075375
+
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { apiFetch, buildQueryString } from '../lib/api';
 

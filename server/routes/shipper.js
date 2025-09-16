@@ -1,4 +1,18 @@
+// RMIT University Vietnam
+// Course: COSC2769 - Full Stack Development
+// Semester: 2025B
+// Assessment: Assignment 02
+// Author: Ryota Suzuki
+// ID: s4075375
+
 /**
+ * RMIT University Vietnam
+ * Course: COSC2769 - Full Stack Development
+ * Semester: 2025B
+ * Assessment: Assignment 02
+ * Author: Ryota Suzuki
+ * ID: s4075375
+ *
  * Routes for shippers managing hub orders.
  */
 const express = require('express');
@@ -13,6 +27,7 @@ const router = express.Router();
 const ensureObjectId = (value) =>
   mongoose.Types.ObjectId.isValid(value) ? new mongoose.Types.ObjectId(value) : null;
 
+// Load the hub assigned to the authenticated shipper.
 const loadShipperHub = async (userId) => {
   if (!mongoose.Types.ObjectId.isValid(userId)) {
     return null;
