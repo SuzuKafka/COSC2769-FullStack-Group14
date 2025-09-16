@@ -68,13 +68,12 @@ app.use('/api/catalog', catalogRouter);
 app.use('/api/shipper', shipperRouter);
 app.use('/api/account', accountRouter);
 
-if (isDevelopment) {
-  // Temporary seeding utilities accessible only in development.
-// Legacy dev seed route removed in favor of dedicated seed script.
-}
-
 app.get('/api/hello', (req, res) => {
   res.json({ message: 'Server running' });
+});
+
+app.use('/api', (req, res) => {
+  res.status(404).json({ error: 'Not Found' });
 });
 
 const clientBuildPath = path.join(__dirname, 'public', 'client');
@@ -105,6 +104,10 @@ app.use((err, req, res, next) => {
     status = 409;
     const duplicateField = Object.keys(err.keyValue || {})[0];
     message = duplicateField ? `Duplicate value for ${duplicateField}.` : 'Duplicate key error.';
+  }
+
+  if (!isDevelopment && status >= 500) {
+    message = 'Internal Server Error';
   }
 
   res.status(status).json({ error: message });

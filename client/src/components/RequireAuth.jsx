@@ -27,7 +27,13 @@ const RequireAuth = ({ allowedRoles }) => {
 
   if (allowedRoles && !allowedRoles.includes(user.role)) {
     const expectedRoles = allowedRoles.join(', ');
-    return buildRedirect(`This area requires one of the following roles: ${expectedRoles}.`);
+    return (
+      <Navigate
+        to="/forbidden"
+        state={{ message: `This area requires one of the following roles: ${expectedRoles}.` }}
+        replace
+      />
+    );
   }
 
   return <Outlet />;

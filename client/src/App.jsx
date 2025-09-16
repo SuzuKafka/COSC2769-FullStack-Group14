@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import Header from './components/Header';
 import RequireAuth from './components/RequireAuth';
@@ -12,6 +12,8 @@ import Cart from './pages/Cart';
 import OrderConfirmation from './pages/OrderConfirmation';
 import ShipperOrders from './pages/ShipperOrders';
 import Account from './pages/Account';
+import Forbidden from './pages/Forbidden';
+import NotFound from './pages/NotFound';
 import { fetchCurrentUser } from './store/authSlice';
 import { getCart } from './store/cartSlice';
 
@@ -40,8 +42,6 @@ const Login = () => {
     </section>
   );
 };
-
-const NotFound = () => <Navigate to="/" replace />;
 
 const AppContent = () => {
   const dispatch = useDispatch();
@@ -72,6 +72,7 @@ const AppContent = () => {
           <Route path="/product/:id" element={<ProductDetail />} />
           <Route path="/cart" element={<Cart />} />
           <Route path="/order-confirmation" element={<OrderConfirmation />} />
+          <Route path="/forbidden" element={<Forbidden />} />
           <Route element={<RequireAuth allowedRoles={['vendor']} />}>
             <Route path="/vendor/new-product" element={<VendorAddProduct />} />
             <Route path="/vendor/my-products" element={<VendorMyProducts />} />
