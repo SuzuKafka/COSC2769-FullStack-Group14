@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { BrowserRouter, Routes, Route, useLocation, useNavigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, useLocation, useNavigate, Link } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import Header from './components/Header';
 import Footer from './components/Footer';
@@ -15,6 +15,9 @@ import ShipperOrders from './pages/ShipperOrders';
 import Account from './pages/Account';
 import Forbidden from './pages/Forbidden';
 import NotFound from './pages/NotFound';
+import RegisterVendor from './pages/RegisterVendor';
+import RegisterCustomer from './pages/RegisterCustomer';
+import RegisterShipper from './pages/RegisterShipper';
 import { fetchCurrentUser, loginUser, clearLoginState } from './store/authSlice';
 import { getCart } from './store/cartSlice';
 
@@ -131,6 +134,20 @@ const Login = () => {
           {disabled ? 'Signing in…' : 'Sign In'}
         </button>
       </form>
+      <div style={{ marginTop: '2rem' }}>
+        <p style={{ marginBottom: '0.5rem' }}>Need an account?</p>
+        <ul style={{ listStyle: 'disc inside', color: '#2563eb' }}>
+          <li>
+            <Link to="/register/customer">Register as Customer</Link>
+          </li>
+          <li>
+            <Link to="/register/vendor">Register as Vendor</Link>
+          </li>
+          <li>
+            <Link to="/register/shipper">Register as Shipper</Link>
+          </li>
+        </ul>
+      </div>
     </section>
   );
 };
@@ -164,6 +181,9 @@ const AppContent = () => {
           <Route path="/product/:id" element={<ProductDetail />} />
           <Route path="/cart" element={<Cart />} />
           <Route path="/order-confirmation" element={<OrderConfirmation />} />
+          <Route path="/register/customer" element={<RegisterCustomer />} />
+          <Route path="/register/vendor" element={<RegisterVendor />} />
+          <Route path="/register/shipper" element={<RegisterShipper />} />
           <Route path="/forbidden" element={<Forbidden />} />
           <Route element={<RequireAuth allowedRoles={['vendor']} />}>
             <Route path="/vendor/new-product" element={<VendorAddProduct />} />

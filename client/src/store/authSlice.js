@@ -66,6 +66,33 @@ export const logoutUser = createAsyncThunk(
   }
 );
 
+export const fetchHubs = createAsyncThunk(
+  'auth/fetchHubs',
+  async (_, { rejectWithValue }) => {
+    try {
+      const data = await apiFetch('/api/auth/hubs');
+      return data?.hubs || [];
+    } catch (error) {
+      return rejectWithValue({ message: error.message || 'Failed to load hubs.' });
+    }
+  }
+);
+
+export const registerUser = createAsyncThunk(
+  'auth/registerUser',
+  async (formData, { rejectWithValue }) => {
+    try {
+      const data = await apiFetch('/api/auth/register', {
+        method: 'POST',
+        body: formData,
+      });
+      return data;
+    } catch (error) {
+      return rejectWithValue({ message: error.message || 'Registration failed.' });
+    }
+  }
+);
+
 const authSlice = createSlice({
   name: 'auth',
   initialState: {
@@ -76,6 +103,11 @@ const authSlice = createSlice({
     profileUploadError: null,
     loginStatus: 'idle',
     loginError: null,
+    registerStatus: 'idle',
+    registerError: null,
+    hubsStatus: 'idle',
+    hubsError: null,
+    hubs: [],
   },
   reducers: {
     setUser(state, action) {
@@ -93,6 +125,10 @@ const authSlice = createSlice({
     clearLoginState(state) {
       state.loginStatus = 'idle';
       state.loginError = null;
+    },
+    resetRegisterState(state) {
+      state.registerStatus = 'idle';
+      state.registerError = null;
     },
   },
   extraReducers: (builder) => {
@@ -157,10 +193,43 @@ const authSlice = createSlice({
       .addCase(logoutUser.rejected, (state, action) => {
         state.loginStatus = 'failed';
         state.loginError = action.payload?.message || action.error.message;
+      })
+      .addCase(fetchHubs.pending, (state) => {
+        state.hubsStatus = 'loading';
+        state.hubsError = null;
+      })
+      .addCase(fetchHubs.fulfilled, (state, action) => {
+        state.hubsStatus = 'succeeded';
+        state.hubs = action.payload;
+      })
+      .addCase(fetchHubs.rejected, (state, action) => {
+        state.hubsStatus = 'failed';
+        state.hubsError = action.payload?.message || action.error.message;
+        state.hubs = [];
+      })
+      .addCase(registerUser.pending, (state) => {
+        state.registerStatus = 'loading';
+        state.registerError = null;
+      })
+      .addCase(registerUser.fulfilled, (state, action) => {
+        state.registerStatus = 'succeeded';
+        state.registerError = null;
+        state.user = action.payload;
+        state.status = 'succeeded';
+      })
+      .addCase(registerUser.rejected, (state, action) => {
+        state.registerStatus = 'failed';
+        state.registerError = action.payload?.message || action.error.message;
       });
   },
 });
 
-export const { setUser, clearAuthError, resetProfileUpload, clearLoginState } = authSlice.actions;
+export const {
+  setUser,
+  clearAuthError,
+  resetProfileUpload,
+  clearLoginState,
+  resetRegisterState,
+} = authSlice.actions;
 
 export default authSlice.reducer;

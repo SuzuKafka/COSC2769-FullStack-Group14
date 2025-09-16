@@ -29,12 +29,22 @@ const userSchema = new Schema(
       type: String,
     },
     customerProfile: {
+      name: {
+        type: String,
+        trim: true,
+      },
       defaultAddress: {
         type: String,
       },
     },
     vendorProfile: {
       companyName: {
+        type: String,
+        unique: true,
+        sparse: true,
+        trim: true,
+      },
+      businessAddress: {
         type: String,
         unique: true,
         sparse: true,
@@ -65,12 +75,26 @@ const userSchema = new Schema(
 );
 
 userSchema.pre('validate', function preValidate(next) {
-  if (this.role === 'vendor' && !this.vendorProfile?.companyName) {
-    return next(new Error('Vendor profile requires companyName.'));
+  if (this.role === 'vendor') {
+    if (!this.vendorProfile?.companyName) {
+      return next(new Error('Vendor profile requires companyName.'));
+    }
+    if (!this.vendorProfile?.businessAddress) {
+      return next(new Error('Vendor profile requires businessAddress.'));
+    }
   }
 
   if (this.role === 'shipper' && !this.shipperProfile?.licenseNumber) {
     return next(new Error('Shipper profile requires licenseNumber.'));
+  }
+
+  if (this.role === 'customer') {
+    if (!this.customerProfile?.name) {
+      return next(new Error('Customer profile requires name.'));
+    }
+    if (!this.customerProfile?.defaultAddress) {
+      return next(new Error('Customer profile requires defaultAddress.'));
+    }
   }
 
   return next();

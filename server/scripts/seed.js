@@ -58,6 +58,7 @@ async function seedUsers(hubs) {
       role: 'vendor',
       vendorProfile: {
         companyName: 'Demo Goods Co.',
+        businessAddress: '12 Vendor Plaza, District 1, Ho Chi Minh City',
         contactEmail: 'vendor@example.com',
       },
     },
@@ -75,6 +76,7 @@ async function seedUsers(hubs) {
       passwordHash: password,
       role: 'customer',
       customerProfile: {
+        name: 'Customer Demo',
         defaultAddress: '101 Sample St, District 3, Ho Chi Minh City',
       },
     },

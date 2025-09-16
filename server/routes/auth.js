@@ -4,6 +4,9 @@
 const express = require('express');
 const bcrypt = require('bcrypt');
 const mongoose = require('mongoose');
+const path = require('path');
+const fs = require('fs');
+const multer = require('multer');
 const User = require('../models/User');
 const DistributionHub = require('../models/DistributionHub');
 const asyncWrap = require('../middleware/asyncWrap');
@@ -25,20 +28,49 @@ const ensureMinLength = (value, fieldName, min = 5) => {
   return value.trim();
 };
 
+const uploadsDir = path.join(__dirname, '..', 'uploads');
+fs.mkdirSync(uploadsDir, { recursive: true });
+
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => cb(null, uploadsDir),
+  filename: (req, file, cb) => {
+    const ext = path.extname(file.originalname || '') || '.jpg';
+    const name = `${Date.now()}-${Math.round(Math.random() * 1e9)}`;
+    cb(null, `${name}${ext}`);
+  },
+});
+
+const imageOnly = (req, file, cb) => {
+  if (file.mimetype && file.mimetype.startsWith('image/')) {
+    return cb(null, true);
+  }
+  const err = createHttpError(400, 'Only image uploads are allowed.');
+  return cb(err);
+};
+
+const uploadProfileImage = multer({ storage, fileFilter: imageOnly });
+
+const trimValue = (value) => (typeof value === 'string' ? value.trim() : '');
+
 router.post(
   '/register',
+  uploadProfileImage.single('profileImage'),
   asyncWrap(async (req, res) => {
     const {
       username,
       password,
       role,
-      vendorProfile,
-      shipperProfile,
-      customerProfile,
     } = req.body;
 
-    if (!username || !password || !role) {
+    const trimmedUsername = trimValue(username);
+    const trimmedRole = trimValue(role).toLowerCase();
+
+    if (!trimmedUsername || !password || !trimmedRole) {
       throw createHttpError(400, 'Username, password, and role are required.');
+    }
+
+    if (!/^[a-zA-Z0-9]+$/.test(trimmedUsername) || trimmedUsername.length < 8 || trimmedUsername.length > 15) {
+      throw createHttpError(400, 'Username must be alphanumeric and 8-15 characters long.');
     }
 
     if (!PASSWORD_REGEX.test(password)) {
@@ -48,66 +80,75 @@ router.post(
       );
     }
 
-    const existingUser = await User.findOne({ username });
+    const existingUser = await User.findOne({ username: trimmedUsername });
     if (existingUser) {
       throw createHttpError(409, 'Username already taken.');
     }
 
     const passwordHash = await bcrypt.hash(password, 10);
     const userData = {
-      username,
+      username: trimmedUsername,
       passwordHash,
-      role,
+      role: trimmedRole,
     };
 
-    if (role === 'vendor') {
-      const companyName = ensureMinLength(
-        vendorProfile?.companyName,
-        'vendorProfile.companyName'
+    if (!req.file) {
+      throw createHttpError(400, 'Profile image is required.');
+    }
+    userData.profileImagePath = `/uploads/${req.file.filename}`;
+
+    if (trimmedRole === 'vendor') {
+      const companyName = ensureMinLength(req.body.vendorCompanyName, 'vendorProfile.companyName');
+      const businessAddress = ensureMinLength(
+        req.body.vendorBusinessAddress,
+        'vendorProfile.businessAddress'
       );
+      const contactEmail = trimValue(req.body.vendorContactEmail);
       userData.vendorProfile = {
         companyName,
-        contactEmail: vendorProfile.contactEmail,
+        businessAddress,
+        contactEmail,
       };
     }
 
-    if (role === 'shipper') {
+    if (trimmedRole === 'customer') {
+      const customerName = ensureMinLength(req.body.customerName, 'customerProfile.name');
+      const customerAddress = ensureMinLength(
+        req.body.customerAddress,
+        'customerProfile.defaultAddress'
+      );
+      userData.customerProfile = {
+        name: customerName,
+        defaultAddress: customerAddress,
+      };
+    }
+
+    if (trimmedRole === 'shipper') {
       const licenseNumber = ensureMinLength(
-        shipperProfile?.licenseNumber,
+        req.body.shipperLicenseNumber,
         'shipperProfile.licenseNumber'
       );
 
-      if (!shipperProfile?.hub) {
-        throw createHttpError(
-          400,
-          'Shipper requires shipperProfile.hub.'
-        );
+      const hubId = trimValue(req.body.shipperHub);
+      if (!hubId) {
+        throw createHttpError(400, 'Shipper requires shipperProfile.hub.');
       }
-      if (!mongoose.Types.ObjectId.isValid(shipperProfile.hub)) {
+      if (!mongoose.Types.ObjectId.isValid(hubId)) {
         throw createHttpError(400, 'shipperProfile.hub must be a valid id.');
       }
 
-      const hubExists = await DistributionHub.exists({ _id: shipperProfile.hub });
+      const hubExists = await DistributionHub.exists({ _id: hubId });
       if (!hubExists) {
         throw createHttpError(400, 'Selected hub does not exist.');
       }
       userData.shipperProfile = {
         licenseNumber,
-        hub: shipperProfile.hub,
+        hub: hubId,
       };
     }
 
-    if (role === 'customer' && customerProfile) {
-      if (customerProfile.defaultAddress) {
-        ensureMinLength(customerProfile.defaultAddress, 'customerProfile.defaultAddress');
-      }
-      userData.customerProfile = {
-        defaultAddress: customerProfile.defaultAddress,
-      };
-    }
-
-    if (req.body.profileImagePath) {
-      userData.profileImagePath = req.body.profileImagePath;
+    if (!['vendor', 'customer', 'shipper'].includes(trimmedRole)) {
+      throw createHttpError(400, 'Invalid role.');
     }
 
     const user = new User(userData);

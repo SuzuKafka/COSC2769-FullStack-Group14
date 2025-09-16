@@ -154,6 +154,7 @@ const Account = () => {
           {user.role === 'customer' && user.customerProfile && (
             <section>
               <h3 style={{ marginBottom: '0.5rem' }}>Customer Details</h3>
+              <p style={{ color: '#475569' }}>Name: {user.customerProfile.name || 'Not set'}</p>
               <p style={{ color: '#475569' }}>
                 Default Address: {user.customerProfile.defaultAddress || 'Not set'}
               </p>
@@ -165,6 +166,9 @@ const Account = () => {
               <h3 style={{ marginBottom: '0.5rem' }}>Vendor Details</h3>
               <p style={{ color: '#475569' }}>
                 Company: {user.vendorProfile.companyName || 'Not provided'}
+              </p>
+              <p style={{ color: '#475569' }}>
+                Business Address: {user.vendorProfile.businessAddress || 'Not provided'}
               </p>
               <p style={{ color: '#475569' }}>
                 Contact Email: {user.vendorProfile.contactEmail || 'Not provided'}
