@@ -53,7 +53,7 @@ async function seedUsers(hubs) {
 
   const [vendor, shipper, customer] = await User.insertMany([
     {
-      username: 'vendor_demo',
+      username: 'vendordemo',
       passwordHash: password,
       role: 'vendor',
       vendorProfile: {
@@ -62,7 +62,7 @@ async function seedUsers(hubs) {
       },
     },
     {
-      username: 'shipper_demo',
+      username: 'shipperdemo',
       passwordHash: password,
       role: 'shipper',
       shipperProfile: {
@@ -71,7 +71,7 @@ async function seedUsers(hubs) {
       },
     },
     {
-      username: 'customer_demo',
+      username: 'customerdemo',
       passwordHash: password,
       role: 'customer',
       customerProfile: {
@@ -88,14 +88,14 @@ async function seedProducts(vendor) {
 
   const products = [
     {
-      name: 'Vietnamese Coffee Beans',
+      name: 'Viet Coffee Beans',
       description: 'Rich and aromatic beans sourced from Vietnam highlands.',
       price: 15.5,
       vendor: vendor._id,
       imagePath: '/uploads/sample-coffee.jpg',
     },
     {
-      name: 'Handcrafted Bamboo Basket',
+      name: 'Bamboo Weave Basket',
       description: 'Eco-friendly basket made by local artisans.',
       price: 22.0,
       vendor: vendor._id,
