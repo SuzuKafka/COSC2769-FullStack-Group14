@@ -15,6 +15,9 @@ import ShipperOrders from './pages/ShipperOrders';
 import Account from './pages/Account';
 import Forbidden from './pages/Forbidden';
 import NotFound from './pages/NotFound';
+import About from './pages/About';
+import Privacy from './pages/Privacy';
+import Help from './pages/Help';
 import RegisterVendor from './pages/RegisterVendor';
 import RegisterCustomer from './pages/RegisterCustomer';
 import RegisterShipper from './pages/RegisterShipper';
@@ -181,6 +184,9 @@ const AppContent = () => {
           <Route path="/product/:id" element={<ProductDetail />} />
           <Route path="/cart" element={<Cart />} />
           <Route path="/order-confirmation" element={<OrderConfirmation />} />
+          <Route path="/about" element={<About />} />
+          <Route path="/privacy" element={<Privacy />} />
+          <Route path="/help" element={<Help />} />
           <Route path="/register/customer" element={<RegisterCustomer />} />
           <Route path="/register/vendor" element={<RegisterVendor />} />
           <Route path="/register/shipper" element={<RegisterShipper />} />

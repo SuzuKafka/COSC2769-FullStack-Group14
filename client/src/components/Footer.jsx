@@ -46,11 +46,14 @@ const Footer = () => (
       </section>
       <section style={columnStyle}>
         <h3 style={headingStyle}>Resources</h3>
-        <Link to="/" style={linkStyle}>
+        <Link to="/privacy" style={linkStyle}>
           Privacy
         </Link>
-        <Link to="/" style={linkStyle}>
+        <Link to="/help" style={linkStyle}>
           Help
+        </Link>
+        <Link to="/about" style={linkStyle}>
+          About
         </Link>
       </section>
       <section style={columnStyle}>
