@@ -1,5 +1,6 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { apiFetch, apiFetchJson } from '../lib/api';
+import { checkoutCart } from './checkoutSlice';
 
 const mapCartPayload = (payload) => ({
   items: payload?.items || [],
@@ -145,6 +146,20 @@ const cartSlice = createSlice({
         state.totalPrice = action.payload.totalPrice;
       })
       .addCase(removeFromCart.rejected, (state, action) => {
+        state.lastActionStatus = 'failed';
+        state.lastActionError = action.payload || action.error.message;
+      })
+      .addCase(checkoutCart.pending, (state) => {
+        state.lastActionStatus = 'loading';
+        state.lastActionError = null;
+      })
+      .addCase(checkoutCart.fulfilled, (state) => {
+        state.lastActionStatus = 'succeeded';
+        state.items = [];
+        state.totalQty = 0;
+        state.totalPrice = 0;
+      })
+      .addCase(checkoutCart.rejected, (state, action) => {
         state.lastActionStatus = 'failed';
         state.lastActionError = action.payload || action.error.message;
       });

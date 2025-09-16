@@ -59,6 +59,16 @@ const Header = () => {
             </Link>
           </>
         )}
+        {user?.role === 'shipper' && (
+          <Link to="/shipper/orders" style={linkStyle}>
+            Shipper Orders
+          </Link>
+        )}
+        {user && (
+          <Link to="/account" style={linkStyle}>
+            My Account
+          </Link>
+        )}
       </nav>
     </header>
   );

@@ -1,6 +1,8 @@
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 import { getCart, removeFromCart, updateCartItem } from '../store/cartSlice';
+import { checkoutCart } from '../store/checkoutSlice';
 
 const containerStyle = {
   maxWidth: '900px',
@@ -34,9 +36,12 @@ const buttonStyle = {
 
 const Cart = () => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const { items, totalQty, totalPrice, status, error, lastActionStatus, lastActionError } = useSelector(
     (state) => state.cart
   );
+  const checkoutStatus = useSelector((state) => state.checkout.status);
+  const checkoutError = useSelector((state) => state.checkout.error);
 
   useEffect(() => {
     if (status === 'idle') {
@@ -57,6 +62,16 @@ const Cart = () => {
   };
 
   const isMutating = lastActionStatus === 'loading';
+  const isCheckoutLoading = checkoutStatus === 'loading';
+
+  const handleCheckout = async () => {
+    try {
+      const order = await dispatch(checkoutCart()).unwrap();
+      navigate('/order-confirmation', { state: order });
+    } catch (err) {
+      // handled via error messaging/toast in state
+    }
+  };
 
   return (
     <section style={containerStyle}>
@@ -67,6 +82,10 @@ const Cart = () => {
 
       {lastActionStatus === 'failed' && lastActionError && (
         <p style={{ color: '#b91c1c' }}>{lastActionError}</p>
+      )}
+
+      {checkoutStatus === 'failed' && checkoutError && (
+        <p style={{ color: '#b91c1c' }}>{checkoutError}</p>
       )}
 
       {items.length === 0 && status === 'succeeded' && <p>Your cart is empty.</p>}
@@ -104,7 +123,7 @@ const Cart = () => {
                       type="button"
                       style={{ ...buttonStyle, backgroundColor: '#ef4444', color: '#fff' }}
                       onClick={() => handleRemove(item.productId)}
-                      disabled={isMutating}
+                      disabled={isMutating || isCheckoutLoading}
                     >
                       Remove
                     </button>
@@ -120,9 +139,10 @@ const Cart = () => {
             <button
               type="button"
               style={{ ...buttonStyle, backgroundColor: '#2563eb', color: '#fff', marginTop: '1rem' }}
-              disabled={isMutating}
+              disabled={isMutating || isCheckoutLoading}
+              onClick={handleCheckout}
             >
-              Proceed to Checkout
+              {isCheckoutLoading ? 'Processing…' : 'Proceed to Checkout'}
             </button>
           </div>
         </>
