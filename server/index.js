@@ -70,8 +70,7 @@ app.use('/api/account', accountRouter);
 
 if (isDevelopment) {
   // Temporary seeding utilities accessible only in development.
-  const devRouter = require('./routes/dev');
-  app.use('/api/dev', devRouter);
+// Legacy dev seed route removed in favor of dedicated seed script.
 }
 
 app.get('/api/hello', (req, res) => {

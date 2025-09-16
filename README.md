@@ -23,6 +23,21 @@ From a clean clone:
 2. Copy the build output into the Express static directory: `mkdir -p ../server/public/client && cp -R dist/* ../server/public/client/`
 3. Start the server from the `server` folder with `node index.js`
 
+### Seed Data
+Run the seed script **before** packaging your submission (do not ship the populated database with the zip). The script clears existing hubs/users/products and inserts clean demo data.
+
+```
+cd server
+node scripts/seed.js
+```
+
+Accounts created by the seed:
+- Vendor: `vendor_demo` / `Password123`
+- Shipper: `shipper_demo` / `Password123`
+- Customer: `customer_demo` / `Password123`
+
+The script also creates three distribution hubs (Ho Chi Minh City, Da Nang, Hanoi) and two sample products.
+
 ### External Environment Test (required)
 Before testing, ensure your MongoDB Atlas cluster accepts connections from all marking locations (temporarily whitelist `0.0.0.0/0`).
 
