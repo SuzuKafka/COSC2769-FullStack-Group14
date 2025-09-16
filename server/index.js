@@ -78,6 +78,20 @@ app.get('/api/hello', (req, res) => {
   res.json({ message: 'Server running' });
 });
 
+const clientBuildPath = path.join(__dirname, 'public', 'client');
+
+if (fs.existsSync(clientBuildPath)) {
+  app.use(express.static(clientBuildPath));
+
+  app.get('*', (req, res) => {
+    if (req.path.startsWith('/api/')) {
+      return res.status(404).json({ error: 'Not Found' });
+    }
+
+    return res.sendFile(path.join(clientBuildPath, 'index.html'));
+  });
+}
+
 app.use((err, req, res, next) => {
   // eslint-disable-next-line no-console
   console.error(err);
