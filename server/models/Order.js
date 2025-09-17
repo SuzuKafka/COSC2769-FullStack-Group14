@@ -50,7 +50,7 @@ const orderSchema = new Schema(
     },
     status: {
       type: String,
-      enum: ['active', 'delivered', 'canceled'],
+      enum: ['active', 'shipped', 'delivered', 'canceled'],
       default: 'active',
     },
     distributionHub: {
@@ -69,6 +69,9 @@ const orderSchema = new Schema(
     placedAt: {
       type: Date,
       default: Date.now,
+    },
+    shippedAt: {
+      type: Date,
     },
     deliveredAt: {
       type: Date,

@@ -267,19 +267,6 @@ const badgeRemoveStyle = {
   marginLeft: '0.15rem',
 };
 
-const clearPillStyle = {
-  display: 'inline-flex',
-  alignItems: 'center',
-  gap: '0.35rem',
-  borderRadius: '999px',
-  border: '1px solid #fecdd3',
-  backgroundColor: '#fff1f2',
-  color: '#be123c',
-  padding: '0.35rem 0.65rem',
-  fontSize: '0.85rem',
-  cursor: 'pointer',
-};
-
 const highlightMarkStyle = {
   backgroundColor: '#fde68a',
   color: '#92400e',
@@ -658,14 +645,6 @@ const Browse = () => {
     setPage(1);
   };
 
-  const handleClearBadges = () => {
-    if (selectedBadges.length === 0) {
-      return;
-    }
-    setSelectedBadges([]);
-    setPage(1);
-  };
-
   const handleAddToCart = (productId) => {
     dispatch(addToCart({ productId, qty: 1 }));
   };
@@ -816,14 +795,6 @@ const Browse = () => {
               <span style={badgeRemoveStyle}>×</span>
             </button>
           ))}
-          <button
-            type="button"
-            onClick={handleClearBadges}
-            style={clearPillStyle}
-            aria-label="Clear all eco badge filters"
-          >
-            Clear badges
-          </button>
         </div>
       )}
 

@@ -21,6 +21,7 @@ const asyncWrap = require('../middleware/asyncWrap');
 const { requireRole } = require('../middleware/auth');
 const Order = require('../models/Order');
 const User = require('../models/User');
+const { createNotification } = require('../lib/notifications');
 
 const router = express.Router();
 
@@ -52,7 +53,7 @@ router.get(
     const hubObjectId = ensureObjectId(hubId);
 
     const orders = await Order.find({
-      status: 'active',
+      status: { $in: ['active', 'shipped'] },
       distributionHub: hubObjectId,
     })
       .populate({
@@ -100,7 +101,7 @@ router.put(
   requireRole('shipper'),
   asyncWrap(async (req, res) => {
     const { status } = req.body;
-    const allowedStatuses = ['delivered', 'canceled'];
+    const allowedStatuses = ['shipped', 'delivered', 'canceled'];
     if (!allowedStatuses.includes(status)) {
       const err = new Error('Invalid status.');
       err.status = 400;
@@ -126,7 +127,7 @@ router.put(
     const order = await Order.findOne({
       _id: orderId,
       distributionHub: hubObjectId,
-      status: 'active',
+      status: { $in: ['active', 'shipped'] },
     });
 
     if (!order) {
@@ -145,17 +146,50 @@ router.put(
     order.status = status;
     order.assignedShipper = shipperId;
 
-    if (status === 'delivered') {
+    if (status === 'shipped') {
+      order.shippedAt = new Date();
+      order.canceledAt = undefined;
+    } else if (status === 'delivered') {
       order.deliveredAt = new Date();
       order.canceledAt = undefined;
+      if (!order.shippedAt) {
+        order.shippedAt = new Date();
+      }
     } else if (status === 'canceled') {
       order.canceledAt = new Date();
       order.deliveredAt = undefined;
     }
 
     await order.save();
+    const orderIdString = order._id.toString();
+    const orderShortId = `#${orderIdString.slice(-6).toUpperCase()}`;
 
-    return res.json({ ok: true });
+    if (order.customer) {
+      let title = null;
+      let message = null;
+      if (status === 'shipped') {
+        title = 'Order shipped';
+        message = `Your order ${orderShortId} has been shipped and is on the way.`;
+      } else if (status === 'delivered') {
+        title = 'Order delivered';
+        message = `Your order ${orderShortId} was delivered. Enjoy your items!`;
+      }
+
+      if (title && message) {
+        await createNotification({
+          userId: order.customer,
+          title,
+          message,
+          link: '/account',
+          metadata: {
+            orderId: orderIdString,
+            status,
+          },
+        });
+      }
+    }
+
+    return res.json({ ok: true, order: order.toObject() });
   })
 );
 

@@ -82,7 +82,27 @@ const shipperSlice = createSlice({
       })
       .addCase(updateShipperOrderStatus.fulfilled, (state, action) => {
         state.updateStatus = 'succeeded';
-        state.orders = state.orders.filter((order) => order._id !== action.payload.orderId);
+        const { status, orderId, order } = action.payload;
+        const normalisedOrderId = orderId?.toString() || orderId;
+        if (status === 'shipped' && order) {
+          state.orders = state.orders.map((existing) => {
+            if ((existing._id?.toString() || existing._id) !== normalisedOrderId) {
+              return existing;
+            }
+            return {
+              ...existing,
+              status,
+              shippedAt: order.shippedAt || existing.shippedAt,
+              deliveredAt: order.deliveredAt || existing.deliveredAt,
+              canceledAt: order.canceledAt || existing.canceledAt,
+              assignedShipper: order.assignedShipper || existing.assignedShipper,
+            };
+          });
+        } else {
+          state.orders = state.orders.filter(
+            (existing) => (existing._id?.toString() || existing._id) !== normalisedOrderId
+          );
+        }
         state.activeOrderId = null;
       })
       .addCase(updateShipperOrderStatus.rejected, (state, action) => {

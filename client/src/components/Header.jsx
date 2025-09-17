@@ -9,6 +9,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { logoutUser } from '../store/authSlice';
+import NotificationBell from './NotificationBell';
 
 // Responsive navigation bar shown on every page. Collapses to a vertical menu on mobile.
 const Header = () => {
@@ -103,17 +104,20 @@ const Header = () => {
           <span className="site-header__title">EcoSwap</span>
           <small className="site-header__tagline">sustainable goods &amp; upcycles</small>
         </Link>
-        <button
-          type="button"
-          className="site-header__toggle"
-          aria-label="Toggle navigation"
-          aria-expanded={isMobileMenuOpen}
-          onClick={handleToggleMenu}
-        >
-          <span />
-          <span />
-          <span />
-        </button>
+        <div className="site-header__actions">
+          {user && <NotificationBell />}
+          <button
+            type="button"
+            className="site-header__toggle"
+            aria-label="Toggle navigation"
+            aria-expanded={isMobileMenuOpen}
+            onClick={handleToggleMenu}
+          >
+            <span />
+            <span />
+            <span />
+          </button>
+        </div>
       </div>
       <nav
         className={`site-header__nav ${

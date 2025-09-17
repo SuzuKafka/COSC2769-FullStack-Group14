@@ -13,6 +13,7 @@ import cartReducer from './cartSlice';
 import checkoutReducer from './checkoutSlice';
 import shipperReducer from './shipperSlice';
 import uiReducer, { addToast } from './uiSlice';
+import notificationsReducer from './notificationsSlice';
 
 const errorToastMiddleware = (storeApi) => (next) => (action) => {
   const result = next(action);
@@ -49,6 +50,7 @@ const store = configureStore({
     checkout: checkoutReducer,
     shipper: shipperReducer,
     ui: uiReducer,
+    notifications: notificationsReducer,
   },
   middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(errorToastMiddleware),
 });

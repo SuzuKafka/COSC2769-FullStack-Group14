@@ -14,6 +14,8 @@ const asyncWrap = require('../middleware/asyncWrap');
 const DistributionHub = require('../models/DistributionHub');
 const Product = require('../models/Product');
 const Order = require('../models/Order');
+const User = require('../models/User');
+const { createNotifications } = require('../lib/notifications');
 
 const router = express.Router();
 
@@ -124,6 +126,57 @@ router.post(
     });
 
     req.session.cart = [];
+
+    const orderIdString = order._id.toString();
+    const orderShortId = `#${orderIdString.slice(-6).toUpperCase()}`;
+
+    const vendorItemMap = new Map();
+    lineItems.forEach((item) => {
+      const product = productMap.get(item.productId);
+      if (!product?.vendor) {
+        return;
+      }
+      const vendorId = product.vendor.toString();
+      const vendorItems = vendorItemMap.get(vendorId) || [];
+      vendorItems.push({ name: product.name, quantity: item.qty });
+      vendorItemMap.set(vendorId, vendorItems);
+    });
+
+    const vendorNotifications = Array.from(vendorItemMap.entries()).map(([vendorId, items]) => {
+      const summary = items
+        .map((entry) => `${entry.name} × ${entry.quantity}`)
+        .join(', ');
+      return {
+        userId: vendorId,
+        title: 'Product sold',
+        message: `${summary} sold in order ${orderShortId}.`,
+        link: '/vendor/my-products',
+        metadata: {
+          orderId: orderIdString,
+          items,
+        },
+      };
+    });
+
+    const shippersForHub = await User.find({
+      role: 'shipper',
+      'shipperProfile.hub': selectedHub._id,
+    })
+      .select('_id')
+      .lean();
+
+    const shipperNotifications = shippersForHub.map((shipper) => ({
+      userId: shipper._id,
+      title: 'New delivery available',
+      message: `Order ${orderShortId} is ready for dispatch from ${selectedHub.name}.`,
+      link: '/shipper/orders',
+      metadata: {
+        orderId: orderIdString,
+        hubId: selectedHub._id.toString(),
+      },
+    }));
+
+    await createNotifications([...vendorNotifications, ...shipperNotifications]);
 
     return res.status(201).json({
       ok: true,

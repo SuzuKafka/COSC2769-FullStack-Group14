@@ -38,6 +38,18 @@ const buttonStyle = {
   fontWeight: 500,
 };
 
+const statusBadgeStyle = {
+  display: 'inline-flex',
+  alignItems: 'center',
+  gap: '0.35rem',
+  padding: '0.25rem 0.6rem',
+  borderRadius: '999px',
+  backgroundColor: '#e0f2fe',
+  color: '#0c4a6e',
+  fontSize: '0.8rem',
+  fontWeight: 600,
+};
+
 const lineItemsStyle = {
   marginTop: '1rem',
   padding: '1rem',
@@ -120,6 +132,9 @@ const ShipperOrders = () => {
 
       {orders.map((order) => {
         const itemCount = order.items?.reduce((sum, item) => sum + (item.quantity || 0), 0) || 0;
+        const statusLabel = order.status
+          ? order.status.charAt(0).toUpperCase() + order.status.slice(1)
+          : 'Active';
         return (
           <article key={order._id} style={cardStyle}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
@@ -128,6 +143,9 @@ const ShipperOrders = () => {
                 <p style={{ color: '#475569', margin: 0 }}>Placed: {formatDateTime(order.createdAt)}</p>
                 <p style={{ color: '#475569', margin: 0 }}>Items: {itemCount}</p>
                 <p style={{ color: '#475569', margin: 0 }}>Total: ${Number(order.total || 0).toFixed(2)}</p>
+                <p style={{ color: '#475569', margin: '0.35rem 0' }}>
+                  Status: <span style={statusBadgeStyle}>{statusLabel}</span>
+                </p>
                 {order.customer && (
                   <p style={{ color: '#475569', margin: 0 }}>
                     Customer: {order.customer.username || order.customer.id}
@@ -176,8 +194,17 @@ const ShipperOrders = () => {
                 </ul>
               </div>
             )}
-
             <div style={actionsStyle}>
+              {order.status !== 'shipped' && (
+                <button
+                  type="button"
+                  style={{ ...buttonStyle, backgroundColor: '#2563eb', color: '#fff' }}
+                  onClick={() => handleUpdate(order._id, 'shipped')}
+                  disabled={isUpdating(order._id)}
+                >
+                  {isUpdating(order._id) ? 'Updating…' : 'Mark Shipped'}
+                </button>
+              )}
               <button
                 type="button"
                 style={{ ...buttonStyle, backgroundColor: '#16a34a', color: '#fff' }}

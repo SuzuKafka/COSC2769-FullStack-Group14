@@ -19,6 +19,7 @@ dotenv.config();
 const DistributionHub = require('../models/DistributionHub');
 const User = require('../models/User');
 const Product = require('../models/Product');
+const Notification = require('../models/Notification');
 
 async function connect() {
   const { MONGODB_URI } = process.env;
@@ -170,6 +171,8 @@ async function main() {
 
     const { vendor, shipper, customer } = await seedUsers(hubs);
     console.log('Seeded vendor, shipper, and customer accounts (password: Password123).');
+
+    await Notification.deleteMany({});
 
     const products = await seedProducts(vendor);
     console.log(`Seeded ${products.length} products for vendor ${vendor.username}.`);

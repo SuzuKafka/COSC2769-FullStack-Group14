@@ -20,6 +20,7 @@ const productRouter = require('./routes/products');
 const catalogRouter = require('./routes/catalog');
 const shipperRouter = require('./routes/shipper');
 const accountRouter = require('./routes/account');
+const notificationsRouter = require('./routes/notifications');
 
 // Load environment variables
 dotenv.config();
@@ -74,6 +75,7 @@ app.use('/api/products', productRouter);
 app.use('/api/catalog', catalogRouter);
 app.use('/api/shipper', shipperRouter);
 app.use('/api/account', accountRouter);
+app.use('/api/notifications', notificationsRouter);
 
 app.get('/api/hello', (req, res) => {
   res.json({ message: 'Server running' });
