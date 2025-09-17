@@ -22,6 +22,11 @@ export const fetchCatalog = createAsyncThunk(
           pages: 1,
           limit: 12,
         },
+        facets: result.facets || {
+          categories: [],
+          materials: [],
+          badges: [],
+        },
         params,
       };
     } catch (error) {
@@ -58,6 +63,11 @@ const catalogSlice = createSlice({
       limit: 12,
     },
     lastParams: {},
+    facets: {
+      categories: [],
+      materials: [],
+      badges: [],
+    },
     product: null,
     productStatus: 'idle',
     productError: null,
@@ -80,6 +90,11 @@ const catalogSlice = createSlice({
         state.items = action.payload.products;
         state.pagination = action.payload.pagination;
         state.lastParams = action.payload.params || {};
+        state.facets = action.payload.facets || {
+          categories: [],
+          materials: [],
+          badges: [],
+        };
       })
       .addCase(fetchCatalog.rejected, (state, action) => {
         state.status = 'failed';

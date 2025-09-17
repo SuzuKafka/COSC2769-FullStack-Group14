@@ -8,6 +8,11 @@
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchMyProducts } from '../store/productsSlice';
+import {
+  BADGE_ICON_MAP,
+  BADGE_DESCRIPTION_MAP,
+  DEFAULT_BADGE_ICON,
+} from '../lib/sustainability';
 
 const listStyle = {
   display: 'grid',
@@ -33,6 +38,39 @@ const imageStyle = {
 
 const contentStyle = {
   padding: '1rem',
+};
+
+const metaStyle = {
+  margin: '0 0 0.5rem',
+  fontSize: '0.85rem',
+  color: '#64748b',
+  textTransform: 'uppercase',
+  letterSpacing: '0.05em',
+};
+
+const materialsStyle = {
+  margin: '0 0 0.75rem',
+  fontSize: '0.9rem',
+  color: '#475569',
+};
+
+const badgeRowStyle = {
+  display: 'flex',
+  flexWrap: 'wrap',
+  gap: '0.4rem',
+  marginTop: '0.75rem',
+};
+
+const badgeChipStyle = {
+  display: 'inline-flex',
+  alignItems: 'center',
+  gap: '0.3rem',
+  padding: '0.3rem 0.55rem',
+  borderRadius: '999px',
+  backgroundColor: '#ecfdf5',
+  color: '#047857',
+  fontSize: '0.8rem',
+  border: '1px solid #bbf7d0',
 };
 
 const VendorMyProducts = () => {
@@ -79,8 +117,30 @@ const VendorMyProducts = () => {
             )}
             <div style={contentStyle}>
               <h3 style={{ margin: '0 0 0.5rem', fontSize: '1.05rem' }}>{product.name}</h3>
+              {product.category && <p style={metaStyle}>{product.category}</p>}
               <p style={{ margin: '0 0 0.75rem', color: '#475569' }}>{product.description}</p>
-              <strong>${Number(product.price).toFixed(2)}</strong>
+              {product.materials?.length > 0 && (
+                <p style={materialsStyle}>
+                  Materials: {product.materials.join(', ')}
+                </p>
+              )}
+              {product.ecoBadges?.length > 0 && (
+                <div style={badgeRowStyle}>
+                  {product.ecoBadges.map((badge) => (
+                    <span
+                      key={badge}
+                      style={badgeChipStyle}
+                      title={BADGE_DESCRIPTION_MAP[badge] || ''}
+                    >
+                      <span role="img" aria-hidden="true">{BADGE_ICON_MAP[badge] || DEFAULT_BADGE_ICON}</span>
+                      {badge}
+                    </span>
+                  ))}
+                </div>
+              )}
+              <strong style={{ display: 'inline-block', marginTop: '0.85rem' }}>
+                ${Number(product.price).toFixed(2)}
+              </strong>
             </div>
           </article>
         ))}

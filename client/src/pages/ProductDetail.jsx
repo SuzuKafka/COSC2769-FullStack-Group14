@@ -10,6 +10,11 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useParams } from 'react-router-dom';
 import { fetchProduct, clearProduct } from '../store/catalogSlice';
 import { addToCart } from '../store/cartSlice';
+import {
+  BADGE_ICON_MAP,
+  BADGE_DESCRIPTION_MAP,
+  DEFAULT_BADGE_ICON,
+} from '../lib/sustainability';
 
 const containerStyle = {
   maxWidth: '960px',
@@ -36,6 +41,58 @@ const buttonStyle = {
   color: '#fff',
   cursor: 'pointer',
   fontWeight: 600,
+};
+
+const detailSectionStyle = {
+  marginTop: '1.5rem',
+};
+
+const detailHeadingStyle = {
+  margin: '0 0 0.75rem',
+  fontSize: '1rem',
+  fontWeight: 600,
+  color: '#0f172a',
+};
+
+const detailListStyle = {
+  display: 'grid',
+  gridTemplateColumns: '140px 1fr',
+  rowGap: '0.5rem',
+  columnGap: '1rem',
+  margin: 0,
+};
+
+const detailTermStyle = {
+  fontSize: '0.9rem',
+  color: '#475569',
+  fontWeight: 600,
+  textTransform: 'uppercase',
+  letterSpacing: '0.05em',
+};
+
+const detailDescStyle = {
+  margin: 0,
+  fontSize: '0.95rem',
+  color: '#0f172a',
+};
+
+const detailBadgeRowStyle = {
+  display: 'flex',
+  flexWrap: 'wrap',
+  gap: '0.5rem',
+  marginTop: '1rem',
+};
+
+const detailBadgeChipStyle = {
+  display: 'inline-flex',
+  alignItems: 'center',
+  gap: '0.35rem',
+  padding: '0.4rem 0.7rem',
+  borderRadius: '999px',
+  backgroundColor: '#ecfdf5',
+  color: '#047857',
+  fontSize: '0.9rem',
+  border: '1px solid #bbf7d0',
 };
 
 // Shows a single product with configurable quantity and cart integration.
@@ -113,6 +170,36 @@ const ProductDetail = () => {
         <h1>{product.name}</h1>
         <p style={{ fontSize: '1.25rem', fontWeight: 600 }}>${Number(product.price).toFixed(2)}</p>
         <p style={{ lineHeight: 1.6 }}>{product.description}</p>
+        <section style={detailSectionStyle}>
+          <h2 style={detailHeadingStyle}>Sustainability Snapshot</h2>
+          <dl style={detailListStyle}>
+            <dt style={detailTermStyle}>Category</dt>
+            <dd style={detailDescStyle}>{product.category || '—'}</dd>
+            <dt style={detailTermStyle}>Materials</dt>
+            <dd style={detailDescStyle}>
+              {product.materials?.length ? product.materials.join(', ') : '—'}
+            </dd>
+            <dt style={detailTermStyle}>Eco Badges</dt>
+            <dd style={detailDescStyle}>
+              {product.ecoBadges?.length ? (
+                <div style={detailBadgeRowStyle}>
+                  {product.ecoBadges.map((badge) => (
+                    <span
+                      key={`${product._id}-${badge}`}
+                      style={detailBadgeChipStyle}
+                      title={BADGE_DESCRIPTION_MAP[badge] || ''}
+                    >
+                      <span role="img" aria-hidden="true">{BADGE_ICON_MAP[badge] || DEFAULT_BADGE_ICON}</span>
+                      {badge}
+                    </span>
+                  ))}
+                </div>
+              ) : (
+                '—'
+              )}
+            </dd>
+          </dl>
+        </section>
         <div style={{ marginTop: '1.5rem', display: 'flex', gap: '1rem', alignItems: 'center' }}>
           <label htmlFor="quantity">
             Quantity

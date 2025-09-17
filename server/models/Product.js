@@ -32,6 +32,27 @@ const productSchema = new Schema(
         message: 'Price must be greater than 0.',
       },
     },
+    category: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+    materials: {
+      type: [String],
+      default: [],
+      set: (materials) =>
+        Array.isArray(materials)
+          ? materials.map((entry) => entry && entry.trim()).filter(Boolean)
+          : [],
+    },
+    ecoBadges: {
+      type: [String],
+      default: [],
+      set: (badges) =>
+        Array.isArray(badges)
+          ? badges.map((entry) => entry && entry.trim()).filter(Boolean)
+          : [],
+    },
     imagePath: {
       type: String,
     },

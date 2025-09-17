@@ -1,11 +1,10 @@
+#!/usr/bin/env node
 // RMIT University Vietnam
 // Course: COSC2769 - Full Stack Development
 // Semester: 2025B
 // Assessment: Assignment 02
 // Author: Ryota Suzuki
 // ID: s4075375
-
-#!/usr/bin/env node
 /* eslint-disable no-console */
 const path = require('path');
 const mongoose = require('mongoose');
@@ -97,18 +96,64 @@ async function seedProducts(vendor) {
 
   const products = [
     {
-      name: 'Viet Coffee Beans',
-      description: 'Rich and aromatic beans sourced from Vietnam highlands.',
-      price: 15.5,
+      name: 'Organic Cotton Tee',
+      description: 'Breathable crewneck tee woven from certified organic cotton.',
+      price: 29.5,
       vendor: vendor._id,
-      imagePath: '/uploads/sample-coffee.jpg',
+      imagePath: '/uploads/sample-tee.jpg',
+      category: 'Clothing',
+      materials: ['Organic cotton'],
+      ecoBadges: ['Fair-trade', 'Low-waste'],
     },
     {
-      name: 'Bamboo Weave Basket',
-      description: 'Eco-friendly basket made by local artisans.',
-      price: 22.0,
+      name: 'Recycled Alu Riser',
+      description: 'Ergonomic laptop riser crafted from post-consumer recycled aluminium.',
+      price: 54.0,
+      vendor: vendor._id,
+      imagePath: '/uploads/sample-stand.jpg',
+      category: 'Electronics',
+      materials: ['Recycled aluminum'],
+      ecoBadges: ['Low-waste', 'Carbon neutral'],
+    },
+    {
+      name: 'Bamboo Picnic Set',
+      description: 'Cutlery and plates made from fast-growing bamboo and recycled plastics.',
+      price: 32.0,
       vendor: vendor._id,
       imagePath: '/uploads/sample-basket.jpg',
+      category: 'Home & Living',
+      materials: ['Bamboo', 'Recycled plastic'],
+      ecoBadges: ['Low-waste'],
+    },
+    {
+      name: 'Upcycled Wood Box',
+      description: 'Planter storage box built from reclaimed hardwood offcuts.',
+      price: 26.5,
+      vendor: vendor._id,
+      imagePath: '/uploads/sample-planter.jpg',
+      category: 'Outdoor',
+      materials: ['Upcycled wood'],
+      ecoBadges: ['Recycled content'],
+    },
+    {
+      name: 'Recycled Plastic Bin',
+      description: 'Durable storage bin moulded from 100% recycled plastic.',
+      price: 18.5,
+      vendor: vendor._id,
+      imagePath: '/uploads/sample-crate.jpg',
+      category: 'Home & Living',
+      materials: ['Recycled plastic'],
+      ecoBadges: ['Recycled content', 'Low-waste'],
+    },
+    {
+      name: 'Fair Coffee Beans',
+      description: 'Shade-grown beans sourced through certified fair-trade cooperatives.',
+      price: 17.5,
+      vendor: vendor._id,
+      imagePath: '/uploads/sample-coffee.jpg',
+      category: 'Grocery',
+      materials: ['Organic beans'],
+      ecoBadges: ['Fair-trade'],
     },
   ];
 

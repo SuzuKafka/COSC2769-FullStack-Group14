@@ -54,6 +54,22 @@ const createHttpError = (status, message) => {
   return error;
 };
 
+const toArray = (value) => {
+  if (value === undefined || value === null) {
+    return [];
+  }
+  if (Array.isArray(value)) {
+    return value;
+  }
+  if (typeof value === 'string') {
+    return [value];
+  }
+  return [];
+};
+
+const sanitizeList = (values) =>
+  [...new Set(toArray(values).map((entry) => (typeof entry === 'string' ? entry.trim() : '')).filter(Boolean))];
+
 router.post(
   '/',
   requireRole('vendor'),
@@ -62,6 +78,9 @@ router.post(
     const name = req.body?.name?.trim();
     const description = req.body?.description?.trim() || '';
     const priceValue = Number.parseFloat(req.body?.price);
+    const category = req.body?.category?.trim();
+    const materials = sanitizeList(req.body?.materials);
+    const ecoBadges = sanitizeList(req.body?.ecoBadges);
 
     if (!name) {
       throw createHttpError(400, 'Product name is required.');
@@ -83,17 +102,28 @@ router.post(
       throw createHttpError(400, 'Product image is required.');
     }
 
+    if (!category) {
+      throw createHttpError(400, 'Category is required.');
+    }
+
+    if (materials.length === 0) {
+      throw createHttpError(400, 'Add at least one material.');
+    }
+
     const product = new Product({
       name,
       description,
       price: priceValue,
       imagePath: `/uploads/${req.file.filename}`,
       vendor: req.user.id,
+      category,
+      materials,
+      ecoBadges,
     });
 
     await product.save();
 
-    return res.status(201).json(product);
+    return res.status(201).json(product.toObject());
   })
 );
 

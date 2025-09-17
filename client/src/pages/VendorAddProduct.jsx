@@ -8,11 +8,21 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { createProduct, resetCreateState } from '../store/productsSlice';
+import {
+  CATEGORY_OPTIONS,
+  MATERIAL_OPTIONS,
+  ECO_BADGE_OPTIONS,
+  BADGE_ICON_MAP,
+  DEFAULT_BADGE_ICON,
+} from '../lib/sustainability';
 
 const initialFormState = {
   name: '',
   price: '',
   description: '',
+  category: '',
+  materials: [],
+  ecoBadges: [],
 };
 
 const formContainerStyle = {
@@ -65,6 +75,70 @@ const successStyle = {
   color: '#166534',
 };
 
+const helperTextStyle = {
+  marginTop: '-0.35rem',
+  marginBottom: '0.75rem',
+  color: '#64748b',
+  fontSize: '0.85rem',
+};
+
+const optionListStyle = {
+  display: 'flex',
+  flexWrap: 'wrap',
+  gap: '0.5rem',
+  marginBottom: '0.75rem',
+};
+
+const checkboxOptionStyle = {
+  display: 'inline-flex',
+  alignItems: 'center',
+  gap: '0.4rem',
+  padding: '0.4rem 0.6rem',
+  borderRadius: '999px',
+  border: '1px solid #cbd5f5',
+  backgroundColor: '#f8fafc',
+  fontSize: '0.85rem',
+  cursor: 'pointer',
+};
+
+const pillListStyle = {
+  display: 'flex',
+  flexWrap: 'wrap',
+  gap: '0.45rem',
+  marginBottom: '1rem',
+};
+
+const pillStyle = {
+  display: 'inline-flex',
+  alignItems: 'center',
+  gap: '0.3rem',
+  padding: '0.35rem 0.6rem',
+  borderRadius: '999px',
+  backgroundColor: '#e0f2fe',
+  color: '#0c4a6e',
+  fontSize: '0.85rem',
+};
+
+const pillRemoveButtonStyle = {
+  background: 'none',
+  border: 'none',
+  color: '#0f172a',
+  cursor: 'pointer',
+  fontWeight: 600,
+  padding: 0,
+  lineHeight: 1,
+};
+
+const inlineButtonStyle = {
+  padding: '0.45rem 0.75rem',
+  borderRadius: '6px',
+  border: '1px solid #cbd5f5',
+  backgroundColor: '#f1f5f9',
+  cursor: 'pointer',
+  fontSize: '0.85rem',
+  fontWeight: 500,
+};
+
 const VendorAddProduct = () => {
   const dispatch = useDispatch();
   const { createStatus, createError } = useSelector((state) => state.products);
@@ -73,6 +147,8 @@ const VendorAddProduct = () => {
   const [touched, setTouched] = useState(false);
   const [successMessage, setSuccessMessage] = useState('');
   const [fileInputKey, setFileInputKey] = useState(0);
+  const [materialInput, setMaterialInput] = useState('');
+  const [badgeInput, setBadgeInput] = useState('');
 
   useEffect(() => {
     return () => {
@@ -87,6 +163,8 @@ const VendorAddProduct = () => {
       setImageFile(null);
       setTouched(false);
       setFileInputKey((previous) => previous + 1);
+      setMaterialInput('');
+      setBadgeInput('');
     } else if (createStatus === 'failed' && createError) {
       setSuccessMessage('');
     }
@@ -114,6 +192,14 @@ const VendorAddProduct = () => {
       currentErrors.image = 'Product image is required.';
     }
 
+    if (!formValues.category.trim()) {
+      currentErrors.category = 'Category is required.';
+    }
+
+    if (!formValues.materials.length) {
+      currentErrors.materials = 'Add at least one material.';
+    }
+
     return currentErrors;
   }, [formValues, imageFile]);
 
@@ -126,6 +212,80 @@ const VendorAddProduct = () => {
       ...previous,
       [name]: value,
     }));
+  };
+
+  const toggleCollectionValue = (value, collection) => {
+    if (!value) {
+      return collection;
+    }
+    if (collection.includes(value)) {
+      return collection.filter((entry) => entry !== value);
+    }
+    return [...collection, value];
+  };
+
+  const handleMaterialToggle = (value) => {
+    const trimmed = value.trim();
+    if (!trimmed) {
+      return;
+    }
+    setFormValues((previous) => ({
+      ...previous,
+      materials: toggleCollectionValue(trimmed, previous.materials),
+    }));
+  };
+
+  const handleBadgeToggle = (value) => {
+    const trimmed = value.trim();
+    if (!trimmed) {
+      return;
+    }
+    setFormValues((previous) => ({
+      ...previous,
+      ecoBadges: toggleCollectionValue(trimmed, previous.ecoBadges),
+    }));
+  };
+
+  const handleMaterialRemove = (value) => {
+    setFormValues((previous) => ({
+      ...previous,
+      materials: previous.materials.filter((entry) => entry !== value),
+    }));
+  };
+
+  const handleBadgeRemove = (value) => {
+    setFormValues((previous) => ({
+      ...previous,
+      ecoBadges: previous.ecoBadges.filter((entry) => entry !== value),
+    }));
+  };
+
+  const handleMaterialSubmit = () => {
+    const trimmed = materialInput.trim();
+    if (!trimmed) {
+      return;
+    }
+    setFormValues((previous) => ({
+      ...previous,
+      materials: previous.materials.includes(trimmed)
+        ? previous.materials
+        : [...previous.materials, trimmed],
+    }));
+    setMaterialInput('');
+  };
+
+  const handleBadgeSubmit = () => {
+    const trimmed = badgeInput.trim();
+    if (!trimmed) {
+      return;
+    }
+    setFormValues((previous) => ({
+      ...previous,
+      ecoBadges: previous.ecoBadges.includes(trimmed)
+        ? previous.ecoBadges
+        : [...previous.ecoBadges, trimmed],
+    }));
+    setBadgeInput('');
   };
 
   const handleFileChange = (event) => {
@@ -144,6 +304,13 @@ const VendorAddProduct = () => {
     formData.append('name', formValues.name.trim());
     formData.append('price', formValues.price);
     formData.append('description', formValues.description.trim());
+    formData.append('category', formValues.category.trim());
+    formValues.materials.forEach((material) => {
+      formData.append('materials', material);
+    });
+    formValues.ecoBadges.forEach((badge) => {
+      formData.append('ecoBadges', badge);
+    });
     if (imageFile) {
       formData.append('image', imageFile);
     }
@@ -214,6 +381,147 @@ const VendorAddProduct = () => {
           disabled={isSubmitting}
         />
         {showErrors && validationErrors.description && <p style={errorStyle}>{validationErrors.description}</p>}
+
+        <label htmlFor="category" style={labelStyle}>
+          Category
+        </label>
+        <input
+          id="category"
+          name="category"
+          type="text"
+          value={formValues.category}
+          onChange={handleChange}
+          style={inputStyle}
+          placeholder="Home & Living"
+          list="category-options"
+          disabled={isSubmitting}
+        />
+        <datalist id="category-options">
+          {CATEGORY_OPTIONS.map((option) => (
+            <option key={option} value={option} />
+          ))}
+        </datalist>
+        <p style={helperTextStyle}>Pick from suggestions or type a new category name.</p>
+        {showErrors && validationErrors.category && <p style={errorStyle}>{validationErrors.category}</p>}
+
+        <fieldset style={{ border: 'none', padding: 0, margin: 0 }}>
+          <legend style={{ ...labelStyle, marginBottom: '0.75rem' }}>Materials</legend>
+          <p style={helperTextStyle}>Select relevant materials or add custom entries.</p>
+          <div style={optionListStyle}>
+            {MATERIAL_OPTIONS.map((option) => {
+              const checked = formValues.materials.includes(option);
+              return (
+                <label key={option} style={checkboxOptionStyle}>
+                  <input
+                    type="checkbox"
+                    checked={checked}
+                    onChange={() => handleMaterialToggle(option)}
+                    disabled={isSubmitting}
+                    style={{ margin: 0 }}
+                  />
+                  <span>{option}</span>
+                </label>
+              );
+            })}
+          </div>
+          <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '0.75rem' }}>
+            <input
+              type="text"
+              value={materialInput}
+              onChange={(event) => setMaterialInput(event.target.value)}
+              placeholder="Add another material"
+              style={{ ...inputStyle, marginBottom: 0 }}
+              disabled={isSubmitting}
+            />
+            <button
+              type="button"
+              onClick={handleMaterialSubmit}
+              style={inlineButtonStyle}
+              disabled={isSubmitting}
+            >
+              Add
+            </button>
+          </div>
+          {formValues.materials.length > 0 && (
+            <div style={pillListStyle}>
+              {formValues.materials.map((material) => (
+                <span key={material} style={pillStyle}>
+                  {material}
+                  <button
+                    type="button"
+                    onClick={() => handleMaterialRemove(material)}
+                    style={pillRemoveButtonStyle}
+                    aria-label={`Remove ${material}`}
+                    disabled={isSubmitting}
+                  >
+                    ×
+                  </button>
+                </span>
+              ))}
+            </div>
+          )}
+          {showErrors && validationErrors.materials && <p style={errorStyle}>{validationErrors.materials}</p>}
+        </fieldset>
+
+        <fieldset style={{ border: 'none', padding: 0, margin: 0 }}>
+          <legend style={{ ...labelStyle, marginBottom: '0.75rem' }}>Eco Badges</legend>
+          <p style={helperTextStyle}>Highlight sustainability badges that apply.</p>
+          <div style={optionListStyle}>
+            {ECO_BADGE_OPTIONS.map((badge) => {
+              const checked = formValues.ecoBadges.includes(badge.value);
+              return (
+                <label key={badge.value} style={checkboxOptionStyle} title={badge.description}>
+                  <input
+                    type="checkbox"
+                    checked={checked}
+                    onChange={() => handleBadgeToggle(badge.value)}
+                    disabled={isSubmitting}
+                    style={{ margin: 0 }}
+                  />
+                  <span role="img" aria-hidden="true">{badge.icon}</span>
+                  <span>{badge.value}</span>
+                </label>
+              );
+            })}
+          </div>
+          <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '0.75rem' }}>
+            <input
+              type="text"
+              value={badgeInput}
+              onChange={(event) => setBadgeInput(event.target.value)}
+              placeholder="Add another badge"
+              style={{ ...inputStyle, marginBottom: 0 }}
+              disabled={isSubmitting}
+            />
+            <button
+              type="button"
+              onClick={handleBadgeSubmit}
+              style={inlineButtonStyle}
+              disabled={isSubmitting}
+            >
+              Add
+            </button>
+          </div>
+          {formValues.ecoBadges.length > 0 && (
+            <div style={pillListStyle}>
+              {formValues.ecoBadges.map((badge) => (
+                <span key={badge} style={{ ...pillStyle, backgroundColor: '#ecfdf5', color: '#047857' }}>
+                  <span role="img" aria-hidden="true">{BADGE_ICON_MAP[badge] || DEFAULT_BADGE_ICON}</span>
+                  {badge}
+                  <button
+                    type="button"
+                    onClick={() => handleBadgeRemove(badge)}
+                    style={pillRemoveButtonStyle}
+                    aria-label={`Remove ${badge}`}
+                    disabled={isSubmitting}
+                  >
+                    ×
+                  </button>
+                </span>
+              ))}
+            </div>
+          )}
+        </fieldset>
 
         <label htmlFor="image" style={labelStyle}>
           Product Image
