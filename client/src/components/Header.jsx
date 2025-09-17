@@ -60,15 +60,19 @@ const Header = () => {
       return links;
     }
 
-    const links = [
-      { key: 'browse', label: 'Browse', to: '/browse' },
-      {
-        key: 'cart',
-        label: 'Cart',
-        to: '/cart',
-        badge: totalQty > 0 ? totalQty : null,
-      },
-    ];
+    const links = [];
+
+    if (user.role === 'customer') {
+      links.push(
+        { key: 'browse', label: 'Browse', to: '/browse' },
+        {
+          key: 'cart',
+          label: 'Cart',
+          to: '/cart',
+          badge: totalQty > 0 ? totalQty : null,
+        },
+      );
+    }
 
     if (user.role === 'vendor') {
       links.push(
@@ -81,11 +85,12 @@ const Header = () => {
       links.push({ key: 'shipper-orders', label: 'Shipper Orders', to: '/shipper/orders' });
     }
 
+    // Remove customer-only routes for vendors/shippers while keeping shared account/logout actions.
     links.push({ key: 'account', label: 'My Account', to: '/account' });
     links.push({ key: 'logout', label: 'Log Out', type: 'button', variant: 'danger' });
 
     return links;
-  }, [totalQty, user, isWelcomeView]);
+  }, [totalQty, user]);
 
   const shouldShowNav = navLinks.length > 0;
 
