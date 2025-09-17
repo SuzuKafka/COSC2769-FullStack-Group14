@@ -10,6 +10,7 @@
  */
 const express = require('express');
 const path = require('path');
+const fs = require('fs');
 const multer = require('multer');
 const Product = require('../models/Product');
 const asyncWrap = require('../middleware/asyncWrap');
@@ -17,7 +18,8 @@ const { requireRole } = require('../middleware/auth');
 
 const router = express.Router();
 
-const uploadsDir = path.join(__dirname, '..', 'public', 'uploads');
+const uploadsDir = path.join(__dirname, '..', 'uploads');
+fs.mkdirSync(uploadsDir, { recursive: true });
 
 const storage = multer.diskStorage({
   destination(req, file, cb) {
