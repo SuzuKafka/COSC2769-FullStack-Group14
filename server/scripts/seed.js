@@ -56,7 +56,7 @@ async function seedHubs() {
 async function seedUsers(hubs) {
   await User.deleteMany({});
 
-  const password = await bcrypt.hash('Password123', 10);
+  const password = await bcrypt.hash('Password123!', 10);
 
   const [vendor, shipper, customer] = await User.insertMany([
     {
@@ -173,7 +173,7 @@ async function main() {
     console.log(`Seeded ${hubs.length} distribution hubs.`);
 
     const { vendor, shipper, customer } = await seedUsers(hubs);
-    console.log('Seeded vendor, shipper, and customer accounts (password: Password123).');
+    console.log('Seeded vendor, shipper, and customer accounts (password: Password123!).');
 
     await Notification.deleteMany({});
 

@@ -32,9 +32,9 @@ cd server
 node scripts/seed.js
 
 Accounts created by the seed:
-- Vendor: `vendordemo` / `Password123`
-- Shipper: `shipperdemo` / `Password123`
-- Customer: `customerdemo` / `Password123`
+- Vendor: `vendordemo` / `Password123!`
+- Shipper: `shipperdemo` / `Password123!`
+- Customer: `customerdemo` / `Password123!`
 
 The script also creates three distribution hubs (Ho Chi Minh City, Da Nang, Hanoi) and two sample products.
 

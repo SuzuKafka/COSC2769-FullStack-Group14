@@ -92,7 +92,8 @@ const Login = () => {
   const dispatch = useDispatch();
   const { loginStatus, loginError, user } = useSelector((state) => state.auth);
   const message = location.state?.message;
-  const redirectPath = location.state?.from?.pathname || '/';
+  const fromPath = location.state?.from?.pathname;
+  const redirectPath = fromPath || '/';
 
   const [formValues, setFormValues] = useState({ username: '', password: '' });
   const [touched, setTouched] = useState(false);
@@ -105,10 +106,26 @@ const Login = () => {
   }, [dispatch]);
 
   useEffect(() => {
-    if (user) {
-      navigate(redirectPath, { replace: true });
+    if (!user) {
+      return;
     }
-  }, [user, navigate, redirectPath]);
+
+    const fallbackPaths = ['/', '/browse'];
+
+    if (user.role === 'vendor') {
+      const target = !fromPath || fallbackPaths.includes(fromPath) ? '/vendor/my-products' : redirectPath;
+      navigate(target, { replace: true });
+      return;
+    }
+
+    if (user.role === 'shipper') {
+      const target = !fromPath || fallbackPaths.includes(fromPath) ? '/shipper/orders' : redirectPath;
+      navigate(target, { replace: true });
+      return;
+    }
+
+    navigate(redirectPath, { replace: true });
+  }, [user, navigate, redirectPath, fromPath]);
 
   const handleChange = (event) => {
     const { name, value } = event.target;
