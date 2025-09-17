@@ -97,10 +97,11 @@ const Header = () => {
     <header className="site-header">
       <div className="site-header__top">
         <Link to="/" className="site-header__brand">
-          <span className="site-header__logo" aria-hidden="true">
-            COSC
+          <span className="site-header__logo" aria-hidden>
+            🌱
           </span>
-          <span>COSC2769 Marketplace</span>
+          <span className="site-header__title">EcoSwap</span>
+          <small className="site-header__tagline">sustainable goods &amp; upcycles</small>
         </Link>
         <button
           type="button"

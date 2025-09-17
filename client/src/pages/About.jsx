@@ -17,23 +17,23 @@ const containerStyle = {
 
 const About = () => (
   <section style={containerStyle}>
-    <h1 style={{ marginBottom: '1.5rem' }}>About COSC2769 Group 14 Marketplace</h1>
+    <h1 style={{ marginBottom: '1.5rem' }}>About EcoSwap (COSC2769 Group 14)</h1>
     <p>
-      COSC2769 Group 14 Marketplace is a teaching project inspired by the customer–vendor–shipper
-      workflow popular across Southeast Asia&apos;s leading commerce platforms. We focus on providing a
-      simple environment where vendors can publish products, customers can discover new items, and
-      shippers coordinate delivery through pre-assigned hubs. This project is submitted for RMIT
-      University Vietnam&apos;s Full Stack Development course (Semester 2025B) by Ryota Suzuki (Student ID
-      s4075375).
+      EcoSwap is the marketplace theme for our COSC2769 Full Stack Development project. Rather than a direct clone of existing platforms, we adapt the multi-role flow—Customers, Vendors, and Shippers—to spotlight sustainable and upcycled products. The platform architecture draws on public references to Lazada&apos;s regional operations (founded 2012 across six Southeast Asian markets, part of Alibaba since 2016) while reimagining the brand around eco-friendly commerce.
+      <sup><a href="#ref-lazada">1</a></sup>
     </p>
+
+    <h3>Key Differentiators</h3>
+    <ul>
+      <li>Eco badges for products (e.g., Upcycled, Organic, Low-waste).</li>
+      <li>Optional &ldquo;Carbon Tip&rdquo; display during checkout to encourage green initiatives.</li>
+      <li>Read-only vendor impact meter derived from order counts.</li>
+    </ul>
+
     <p>
-      The logistics narrative that underpins this coursework draws on Lazada Group&apos;s 2030 vision to
-      reach 300 million customers across Indonesia, Malaysia, the Philippines, Singapore, Thailand, and
-      Vietnam<sup><a href="#ref-lazada">1</a></sup>. From that regional context we designed a minimal feature set that still includes
-      key platform capabilities: authenticated sessions, multi-role registration, server-side product
-      filtering, and shipper hub assignments. All implementation is original and created solely for
-      academic purposes.
+      EcoSwap supports the full marketplace lifecycle: registration flows for all roles, product publishing, server-side search, cart and checkout, and shipper hub coordination across Ho Chi Minh City, Da Nang, and Hanoi.
     </p>
+
     <hr style={{ margin: '2.5rem 0' }} />
     <p id="ref-lazada" style={{ fontSize: '0.9rem', color: '#475569' }}>
       <strong>References:</strong> <br />

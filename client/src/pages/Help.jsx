@@ -15,41 +15,45 @@ const containerStyle = {
   color: '#1f2937',
 };
 
-const listStyle = {
-  marginLeft: '1.2rem',
-};
-
 const Help = () => (
   <section style={containerStyle}>
     <h1 style={{ marginBottom: '1.5rem' }}>Help Centre</h1>
-    <p>
-      This help page guides you through the demo journeys built for COSC2769 Group 14 Marketplace. Use
-      the following checklists to exercise the full feature set with your customer, vendor, and shipper
-      accounts.
-    </p>
-    <h2>Getting Started</h2>
-    <ol style={listStyle}>
-      <li>Register a new account from the login page (or use seeded credentials if provided).</li>
-      <li>Verify your profile image, name, and address on the My Account page.</li>
-      <li>Add products as a vendor and test server-side search as a customer.</li>
-    </ol>
-    <h2>Common Questions</h2>
-    <dl>
-      <dt style={{ fontWeight: 600 }}>How do I reset my password?</dt>
-      <dd>For the demo deployment, contact the course team to request a reset.</dd>
-      <dt style={{ fontWeight: 600 }}>Where do orders go after checkout?</dt>
-      <dd>
-        Orders are assigned randomly to Ho Chi Minh City, Da Nang, or Hanoi distribution hubs. Shippers
-        see only orders for the hub they selected during registration.
-      </dd>
-      <dt style={{ fontWeight: 600 }}>Who built this site?</dt>
-      <dd>Ryota Suzuki (s4075375) for COSC2769 – Full Stack Development, Semester 2025B.</dd>
-    </dl>
-    <h2>Need More Assistance?</h2>
-    <p>
-      Please contact the teaching staff via Canvas, or refer to RMIT Vietnam&apos;s support channels for
-      technical questions about the coursework submission guidelines.
-    </p>
+
+    <section>
+      <h2>Quick Start</h2>
+      <ol>
+        <li>Create an EcoSwap account (Customer, Vendor, or Shipper).</li>
+        <li>Customers: browse products, apply search/price filters, add to cart, and place an order.</li>
+        <li>Vendors: add eco-friendly products with images and manage listings via My Products.</li>
+        <li>Shippers: review active orders assigned to your hub and update the status.</li>
+      </ol>
+    </section>
+
+    <section>
+      <h2>FAQ</h2>
+      <details>
+        <summary>Which roles are available?</summary>
+        <p>Customer, Vendor, and Shipper — each with dedicated registration and My Account views.</p>
+      </details>
+      <details>
+        <summary>How are orders routed?</summary>
+        <p>
+          Orders are assigned randomly to one of the seeded distribution hubs (Ho Chi Minh City, Da Nang,
+          Hanoi). Shippers registered to that hub can mark orders delivered or canceled.
+        </p>
+      </details>
+      <details>
+        <summary>Where can I read about privacy?</summary>
+        <p>
+          See the <a href="/privacy">Privacy Statement</a>, informed by Australia&apos;s Privacy Act 1988 and the
+          Australian Privacy Principles (OAIC).
+        </p>
+      </details>
+      <details>
+        <summary>Who built EcoSwap?</summary>
+        <p>Group 14 — led by Ryota Suzuki (Student ID s4075375) for COSC2769, Semester 2025B.</p>
+      </details>
+    </section>
   </section>
 );
 

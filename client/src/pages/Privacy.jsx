@@ -19,30 +19,36 @@ const Privacy = () => (
   <section style={containerStyle}>
     <h1 style={{ marginBottom: '1.5rem' }}>Privacy Statement</h1>
     <p>
-      We collect only the information required to operate the coursework marketplace: an email or
-      contact address (when supplied by vendors), profile photographs, and product catalog data. No
-      payment details are gathered. All passwords are hashed with bcrypt before storage so that plain
-      text credentials are never written to disk. Profile images are stored on the application server and
-      referenced via generated file names.
+      EcoSwap respects your personal information. This coursework follows the spirit of the Australian
+      Privacy Principles (APPs) under the Privacy Act 1988, including clear handling (APP 1), secure
+      storage, and using the data solely for the purpose of account management and order fulfillment.
+      For authoritative guidance, consult the Office of the Australian Information Commissioner (OAIC).
     </p>
+
+    <h2>What we collect</h2>
+    <ul>
+      <li>Account data: username, hashed password, profile photo, and role-specific details.</li>
+      <li>Order data: product listings, cart contents, and assigned hubs for delivery.</li>
+    </ul>
+
+    <h2>How we use it</h2>
+    <ul>
+      <li>Authenticate users and enable role-based features (Customer, Vendor, Shipper).</li>
+      <li>Process orders and display relevant information in My Account and Shipper dashboards.</li>
+    </ul>
+
+    <h2>Storage & Security</h2>
     <p>
-      Users may download or remove their data by contacting the course team. Because this application is
-      built for educational purposes, there is no automated data retention policy beyond the semester in
-      which it is assessed. We follow the Australian Privacy Principles statutory guidance on storing
-      personal information securely and restricting use to the original purpose of collection<sup><a href="#ref-app">1</a></sup>.
+      Passwords are hashed before storage; images are stored by filename as permitted in the brief. The
+      MongoDB Atlas database is restricted to this educational demo and will be reset at the end of the
+      semester.
     </p>
-    <hr style={{ margin: '2.5rem 0' }} />
-    <p id="ref-app" style={{ fontSize: '0.9rem', color: '#475569' }}>
-      <strong>References:</strong> <br />
-      1. Office of the Australian Information Commissioner, &ldquo;Australian Privacy Principles&rdquo; (2024),
-      <a
-        href="https://www.oaic.gov.au/privacy/australian-privacy-principles/"
-        target="_blank"
-        rel="noopener noreferrer"
-        style={{ color: '#2563eb' }}
-      >
-        https://www.oaic.gov.au/privacy/australian-privacy-principles/
-      </a>
+
+    <h2>Third-party references</h2>
+    <p>
+      We studied Lazada&apos;s public background to understand logistics flows while designing EcoSwap&apos;s
+      multi-role marketplace. Sources: Lazada Group (Product outline) and OAIC (Australian Privacy
+      Principles).
     </p>
   </section>
 );

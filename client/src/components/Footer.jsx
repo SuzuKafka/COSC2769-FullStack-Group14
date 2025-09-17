@@ -45,26 +45,15 @@ const Footer = () => (
   <footer style={footerStyle}>
     <div style={footerInnerStyle}>
       <section style={columnStyle}>
-        <h3 style={headingStyle}>About</h3>
+        <h3 style={headingStyle}>EcoSwap by COSC2769 Group 14</h3>
         <p style={{ margin: 0, lineHeight: 1.6 }}>
-          COSC2769 Group 14 showcases a sample marketplace experience built for the RMIT Full Stack
-          Development course.
+          Buy better, waste less — a sustainable marketplace crafted for the Full Stack Development
+          project.
         </p>
+        <p style={{ marginTop: '0.75rem' }}>© {new Date().getFullYear()} COSC2769 Group 14</p>
       </section>
       <section style={columnStyle}>
-        <h3 style={headingStyle}>Resources</h3>
-        <Link to="/privacy" style={linkStyle}>
-          Privacy
-        </Link>
-        <Link to="/help" style={linkStyle}>
-          Help
-        </Link>
-        <Link to="/about" style={linkStyle}>
-          About
-        </Link>
-      </section>
-      <section style={columnStyle}>
-        <h3 style={headingStyle}>Get Started</h3>
+        <h3 style={headingStyle}>Join EcoSwap</h3>
         <Link to="/register/customer" style={linkStyle}>
           Register as Customer
         </Link>
@@ -76,11 +65,16 @@ const Footer = () => (
         </Link>
       </section>
       <section style={columnStyle}>
-        <h3 style={headingStyle}>Credits</h3>
-        <p style={{ margin: 0, lineHeight: 1.6 }}>
-          UI inspired by Tailwind UI examples (tailwindui.com) and adapted for coursework submission.
-        </p>
-        <p style={{ marginTop: '0.75rem' }}>© {new Date().getFullYear()} COSC2769 Group 14</p>
+        <h3 style={headingStyle}>Resources</h3>
+        <Link to="/about" style={linkStyle}>
+          About
+        </Link>
+        <Link to="/privacy" style={linkStyle}>
+          Privacy
+        </Link>
+        <Link to="/help" style={linkStyle}>
+          Help
+        </Link>
       </section>
     </div>
   </footer>
