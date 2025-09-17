@@ -5,7 +5,7 @@
 // Author: Ryota Suzuki
 // ID: s4075375
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchMyProducts } from '../store/productsSlice';
 import {
@@ -77,6 +77,28 @@ const VendorMyProducts = () => {
   const dispatch = useDispatch();
   const { items, status, error } = useSelector((state) => state.products);
 
+  const assetBaseUrl = useMemo(() => {
+    if (typeof window === 'undefined') {
+      return '';
+    }
+    const { origin } = window.location;
+    if (origin.includes('localhost') || origin.includes('127.0.0.1')) {
+      return 'http://localhost:4000';
+    }
+    return '';
+  }, []);
+
+  const resolveImagePath = (path) => {
+    if (!path) {
+      return null;
+    }
+    if (/^https?:\/\//i.test(path)) {
+      return path;
+    }
+    const normalizedPath = path.startsWith('/') ? path : `/${path}`;
+    return assetBaseUrl ? `${assetBaseUrl}${normalizedPath}` : normalizedPath;
+  };
+
   useEffect(() => {
     if (status === 'idle') {
       dispatch(fetchMyProducts());
@@ -103,19 +125,23 @@ const VendorMyProducts = () => {
     <section>
       <h2 style={{ padding: '1.5rem', margin: 0 }}>My Products</h2>
       <div style={listStyle}>
-        {items.map((product) => (
-          <article key={product._id} style={cardStyle}>
-            {product.imagePath ? (
+      {items.map((product) => (
+        <article key={product._id} style={cardStyle}>
+          {(() => {
+            const imageSrc = resolveImagePath(product.imagePath);
+            if (!imageSrc) {
+              return <div style={imageStyle} />;
+            }
+            return (
               <img
-                src={`/public${product.imagePath}`}
+                src={imageSrc}
                 alt={product.name}
                 style={imageStyle}
                 loading="lazy"
               />
-            ) : (
-              <div style={imageStyle} />
-            )}
-            <div style={contentStyle}>
+            );
+          })()}
+          <div style={contentStyle}>
               <h3 style={{ margin: '0 0 0.5rem', fontSize: '1.05rem' }}>{product.name}</h3>
               {product.category && <p style={metaStyle}>{product.category}</p>}
               <p style={{ margin: '0 0 0.75rem', color: '#475569' }}>{product.description}</p>

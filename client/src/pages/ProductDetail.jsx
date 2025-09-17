@@ -120,7 +120,8 @@ const ProductDetail = () => {
     if (/^https?:\/\//i.test(path)) {
       return path;
     }
-    return `${assetBaseUrl}/public${path}`;
+    const normalizedPath = path.startsWith('/') ? path : `/${path}`;
+    return assetBaseUrl ? `${assetBaseUrl}${normalizedPath}` : normalizedPath;
   };
 
   useEffect(() => {

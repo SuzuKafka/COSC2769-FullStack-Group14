@@ -58,7 +58,7 @@ const Account = () => {
       return '';
     }
     const { origin } = window.location;
-    if (origin.includes('localhost:3000')) {
+    if (origin.includes('localhost') || origin.includes('127.0.0.1')) {
       return 'http://localhost:4000';
     }
     return '';
