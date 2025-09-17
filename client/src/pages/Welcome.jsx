@@ -168,6 +168,9 @@ const PageContent = () => {
         A sustainable marketplace connecting conscious shoppers with eco-forward makers.
         Swap smarter, ship greener, and support circular commerce in every order.
       </p>
+      <div style={{ marginBottom: '1rem' }}>
+        <h2 style={{ margin: 0, fontSize: '1.75rem', color: '#1e293b' }}>Register as Customer</h2>
+      </div>
       <div style={actionsStyle}>
         <Link to="/login" style={primaryButtonStyle}>
           Sign in to continue

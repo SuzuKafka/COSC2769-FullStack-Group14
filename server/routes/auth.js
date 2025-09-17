@@ -63,11 +63,7 @@ router.post(
   '/register',
   uploadProfileImage.single('profileImage'),
   asyncWrap(async (req, res) => {
-    const {
-      username,
-      password,
-      role,
-    } = req.body;
+    const { username, password, confirmPassword, role } = req.body;
 
     const trimmedUsername = trimValue(username);
     const trimmedRole = trimValue(role).toLowerCase();
@@ -92,18 +88,22 @@ router.post(
       throw createHttpError(409, 'Username already taken.');
     }
 
-    const passwordHash = await bcrypt.hash(password, 10);
-  const userData = {
-    username: trimmedUsername,
-    passwordHash,
-    role: trimmedRole,
-  };
+    if (password !== confirmPassword) {
+      throw createHttpError(400, 'Passwords do not match.');
+    }
 
-  if (!req.file) {
-    throw createHttpError(400, 'Profile image is required.');
-  }
-  // Store only the generated filename; static middleware exposes /uploads publicly.
-  userData.profileImagePath = `/uploads/${req.file.filename}`;
+    const passwordHash = await bcrypt.hash(password, 10);
+    const userData = {
+      username: trimmedUsername,
+      passwordHash,
+      role: trimmedRole,
+    };
+
+    if (!req.file) {
+      throw createHttpError(400, 'Profile image is required.');
+    }
+    // Store only the generated filename; static middleware exposes /uploads publicly.
+    userData.profileImagePath = `/uploads/${req.file.filename}`;
 
     if (trimmedRole === 'vendor') {
       const companyName = ensureMinLength(req.body.vendorCompanyName, 'vendorProfile.companyName');

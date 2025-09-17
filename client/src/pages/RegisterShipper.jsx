@@ -7,7 +7,7 @@
 
 import React, { useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { fetchHubs, registerUser, resetRegisterState } from '../store/authSlice';
 
 const usernameRegex = /^[A-Za-z0-9]{8,15}$/;
@@ -49,6 +49,7 @@ const RegisterShipper = () => {
   const [formValues, setFormValues] = useState({
     username: '',
     password: '',
+    confirmPassword: '',
     licenseNumber: '',
     hub: '',
   });
@@ -77,13 +78,16 @@ const RegisterShipper = () => {
 
   const validationErrors = useMemo(() => {
     const errors = {};
-    const { username, password, licenseNumber, hub } = formValues;
+    const { username, password, confirmPassword, licenseNumber, hub } = formValues;
     if (!usernameRegex.test(username.trim())) {
       errors.username = 'Username must be alphanumeric and 8-15 characters.';
     }
     if (!passwordRegex.test(password)) {
       errors.password =
         'Password must be 8-20 characters and include upper, lower, digit, and !@#$%^&*.';
+    }
+    if (confirmPassword !== password) {
+      errors.confirmPassword = 'Passwords must match.';
     }
     if (!licenseNumber.trim() || licenseNumber.trim().length < 5) {
       errors.licenseNumber = 'License number must be at least 5 characters.';
@@ -117,6 +121,7 @@ const RegisterShipper = () => {
     formData.append('role', 'shipper');
     formData.append('username', formValues.username.trim());
     formData.append('password', formValues.password);
+    formData.append('confirmPassword', formValues.confirmPassword);
     formData.append('shipperLicenseNumber', formValues.licenseNumber.trim());
     formData.append('shipperHub', formValues.hub);
     if (profileImage) {
@@ -143,7 +148,7 @@ const RegisterShipper = () => {
             value={formValues.username}
             onChange={handleChange}
             style={inputStyle}
-            placeholder="8-15 characters"
+            placeholder="8-15 letters or digits"
             disabled={isSubmitting}
             autoComplete="username"
           />
@@ -161,11 +166,31 @@ const RegisterShipper = () => {
             value={formValues.password}
             onChange={handleChange}
             style={inputStyle}
-            placeholder="Password123"
+            placeholder="8-20 chars with upper, lower, digit, and !@#$%^&*."
             disabled={isSubmitting}
             autoComplete="new-password"
           />
           {showErrors && validationErrors.password && <p style={errorStyle}>{validationErrors.password}</p>}
+        </div>
+
+        <div>
+          <label htmlFor="confirmPassword" style={labelStyle}>
+            Confirm Password
+          </label>
+          <input
+            id="confirmPassword"
+            name="confirmPassword"
+            type="password"
+            value={formValues.confirmPassword}
+            onChange={handleChange}
+            style={inputStyle}
+            placeholder="Re-enter password"
+            disabled={isSubmitting}
+            autoComplete="new-password"
+          />
+          {showErrors && validationErrors.confirmPassword && (
+            <p style={errorStyle}>{validationErrors.confirmPassword}</p>
+          )}
         </div>
 
         <div>
@@ -195,6 +220,7 @@ const RegisterShipper = () => {
             value={formValues.licenseNumber}
             onChange={handleChange}
             style={inputStyle}
+            placeholder="At least 5 characters"
             disabled={isSubmitting}
           />
           {showErrors && validationErrors.licenseNumber && (
@@ -243,6 +269,9 @@ const RegisterShipper = () => {
           {isSubmitting ? 'Registering…' : 'Create Shipper Account'}
         </button>
       </form>
+      <p style={{ marginTop: '1.5rem', textAlign: 'center', color: '#475569' }}>
+        Already have an account? <Link to="/login">Sign in</Link>
+      </p>
     </section>
   );
 };

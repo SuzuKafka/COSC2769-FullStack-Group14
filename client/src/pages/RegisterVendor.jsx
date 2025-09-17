@@ -7,7 +7,7 @@
 
 import React, { useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import {
   registerUser,
   resetRegisterState,
@@ -52,6 +52,7 @@ const RegisterVendor = () => {
   const [formValues, setFormValues] = useState({
     username: '',
     password: '',
+    confirmPassword: '',
     businessName: '',
     businessAddress: '',
     contactEmail: '',
@@ -75,13 +76,16 @@ const RegisterVendor = () => {
 
   const validationErrors = useMemo(() => {
     const errors = {};
-    const { username, password, businessName, businessAddress } = formValues;
+    const { username, password, confirmPassword, businessName, businessAddress } = formValues;
     if (!usernameRegex.test(username.trim())) {
       errors.username = 'Username must be alphanumeric and 8-15 characters.';
     }
     if (!passwordRegex.test(password)) {
       errors.password =
         'Password must be 8-20 characters and include upper, lower, digit, and !@#$%^&*.';
+    }
+    if (confirmPassword !== password) {
+      errors.confirmPassword = 'Passwords must match.';
     }
     if (!businessName.trim() || businessName.trim().length < 5) {
       errors.businessName = 'Business name must be at least 5 characters.';
@@ -115,6 +119,7 @@ const RegisterVendor = () => {
     formData.append('role', 'vendor');
     formData.append('username', formValues.username.trim());
     formData.append('password', formValues.password);
+    formData.append('confirmPassword', formValues.confirmPassword);
     formData.append('vendorCompanyName', formValues.businessName.trim());
     formData.append('vendorBusinessAddress', formValues.businessAddress.trim());
     if (formValues.contactEmail.trim()) {
@@ -144,7 +149,7 @@ const RegisterVendor = () => {
             value={formValues.username}
             onChange={handleChange}
             style={inputStyle}
-            placeholder="8-15 characters"
+            placeholder="8-15 letters or digits"
             disabled={isSubmitting}
             autoComplete="username"
           />
@@ -162,11 +167,31 @@ const RegisterVendor = () => {
             value={formValues.password}
             onChange={handleChange}
             style={inputStyle}
-            placeholder="Password123"
+            placeholder="8-20 chars with upper, lower, digit, and !@#$%^&*."
             disabled={isSubmitting}
             autoComplete="new-password"
           />
           {showErrors && validationErrors.password && <p style={errorStyle}>{validationErrors.password}</p>}
+        </div>
+
+        <div>
+          <label htmlFor="confirmPassword" style={labelStyle}>
+            Confirm Password
+          </label>
+          <input
+            id="confirmPassword"
+            name="confirmPassword"
+            type="password"
+            value={formValues.confirmPassword}
+            onChange={handleChange}
+            style={inputStyle}
+            placeholder="Re-enter password"
+            disabled={isSubmitting}
+            autoComplete="new-password"
+          />
+          {showErrors && validationErrors.confirmPassword && (
+            <p style={errorStyle}>{validationErrors.confirmPassword}</p>
+          )}
         </div>
 
         <div>
@@ -196,6 +221,7 @@ const RegisterVendor = () => {
             value={formValues.businessName}
             onChange={handleChange}
             style={inputStyle}
+            placeholder="At least 5 characters"
             disabled={isSubmitting}
           />
           {showErrors && validationErrors.businessName && <p style={errorStyle}>{validationErrors.businessName}</p>}
@@ -212,6 +238,7 @@ const RegisterVendor = () => {
             value={formValues.businessAddress}
             onChange={handleChange}
             style={inputStyle}
+            placeholder="At least 5 characters"
             disabled={isSubmitting}
           />
           {showErrors && validationErrors.businessAddress && (
@@ -252,6 +279,9 @@ const RegisterVendor = () => {
           {isSubmitting ? 'Registering…' : 'Create Vendor Account'}
         </button>
       </form>
+      <p style={{ marginTop: '1.5rem', textAlign: 'center', color: '#475569' }}>
+        Already have an account? <Link to="/login">Sign in</Link>
+      </p>
     </section>
   );
 };

@@ -7,7 +7,7 @@
 
 import React, { useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { registerUser, resetRegisterState } from '../store/authSlice';
 
 const usernameRegex = /^[A-Za-z0-9]{8,15}$/;
@@ -49,6 +49,7 @@ const RegisterCustomer = () => {
   const [formValues, setFormValues] = useState({
     username: '',
     password: '',
+    confirmPassword: '',
     fullName: '',
     address: '',
   });
@@ -71,13 +72,16 @@ const RegisterCustomer = () => {
 
   const validationErrors = useMemo(() => {
     const errors = {};
-    const { username, password, fullName, address } = formValues;
+    const { username, password, confirmPassword, fullName, address } = formValues;
     if (!usernameRegex.test(username.trim())) {
       errors.username = 'Username must be alphanumeric and 8-15 characters.';
     }
     if (!passwordRegex.test(password)) {
       errors.password =
         'Password must be 8-20 characters and include upper, lower, digit, and !@#$%^&*.';
+    }
+    if (confirmPassword !== password) {
+      errors.confirmPassword = 'Passwords must match.';
     }
     if (!fullName.trim() || fullName.trim().length < 5) {
       errors.fullName = 'Name must be at least 5 characters.';
@@ -111,6 +115,7 @@ const RegisterCustomer = () => {
     formData.append('role', 'customer');
     formData.append('username', formValues.username.trim());
     formData.append('password', formValues.password);
+    formData.append('confirmPassword', formValues.confirmPassword);
     formData.append('customerName', formValues.fullName.trim());
     formData.append('customerAddress', formValues.address.trim());
     if (profileImage) {
@@ -137,7 +142,7 @@ const RegisterCustomer = () => {
             value={formValues.username}
             onChange={handleChange}
             style={inputStyle}
-            placeholder="8-15 characters"
+            placeholder="8-15 letters or digits"
             disabled={isSubmitting}
             autoComplete="username"
           />
@@ -155,11 +160,31 @@ const RegisterCustomer = () => {
             value={formValues.password}
             onChange={handleChange}
             style={inputStyle}
-            placeholder="Password123"
+            placeholder="8-20 chars with upper, lower, digit, and !@#$%^&*."
             disabled={isSubmitting}
             autoComplete="new-password"
           />
           {showErrors && validationErrors.password && <p style={errorStyle}>{validationErrors.password}</p>}
+        </div>
+
+        <div>
+          <label htmlFor="confirmPassword" style={labelStyle}>
+            Confirm Password
+          </label>
+          <input
+            id="confirmPassword"
+            name="confirmPassword"
+            type="password"
+            value={formValues.confirmPassword}
+            onChange={handleChange}
+            style={inputStyle}
+            placeholder="Re-enter password"
+            disabled={isSubmitting}
+            autoComplete="new-password"
+          />
+          {showErrors && validationErrors.confirmPassword && (
+            <p style={errorStyle}>{validationErrors.confirmPassword}</p>
+          )}
         </div>
 
         <div>
@@ -189,6 +214,7 @@ const RegisterCustomer = () => {
             value={formValues.fullName}
             onChange={handleChange}
             style={inputStyle}
+            placeholder="At least 5 characters"
             disabled={isSubmitting}
           />
           {showErrors && validationErrors.fullName && <p style={errorStyle}>{validationErrors.fullName}</p>}
@@ -205,6 +231,7 @@ const RegisterCustomer = () => {
             value={formValues.address}
             onChange={handleChange}
             style={inputStyle}
+            placeholder="At least 5 characters"
             disabled={isSubmitting}
           />
           {showErrors && validationErrors.address && <p style={errorStyle}>{validationErrors.address}</p>}
@@ -228,6 +255,9 @@ const RegisterCustomer = () => {
           {isSubmitting ? 'Registering…' : 'Create Customer Account'}
         </button>
       </form>
+      <p style={{ marginTop: '1.5rem', textAlign: 'center', color: '#475569' }}>
+        Already have an account? <Link to="/login">Sign in</Link>
+      </p>
     </section>
   );
 };

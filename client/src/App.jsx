@@ -49,6 +49,43 @@ const pageContainerStyle = {
   padding: '2rem',
 };
 
+const loginWrapperStyle = {
+  minHeight: 'calc(100vh - 64px)',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  padding: '2rem',
+  backgroundColor: '#f1f5f9',
+};
+
+const loginCardStyle = {
+  width: '100%',
+  maxWidth: '420px',
+  backgroundColor: '#fff',
+  padding: '2.5rem',
+  borderRadius: '16px',
+  boxShadow: '0 25px 50px rgba(15, 23, 42, 0.15)',
+  display: 'grid',
+  gap: '1.25rem',
+};
+
+const inputWrapperStyle = {
+  position: 'relative',
+  display: 'flex',
+  alignItems: 'center',
+};
+
+const togglePasswordStyle = {
+  position: 'absolute',
+  right: '0.75rem',
+  background: 'transparent',
+  border: 'none',
+  color: '#2563eb',
+  fontWeight: 600,
+  cursor: 'pointer',
+  padding: 0,
+};
+
 const Login = () => {
   const location = useLocation();
   const navigate = useNavigate();
@@ -59,6 +96,7 @@ const Login = () => {
 
   const [formValues, setFormValues] = useState({ username: '', password: '' });
   const [touched, setTouched] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   useEffect(() => {
     return () => {
@@ -90,13 +128,12 @@ const Login = () => {
   const showValidation = touched && (!formValues.username.trim() || !formValues.password.trim());
 
   return (
-    <section style={pageContainerStyle}>
-      <h2>Login</h2>
-      {message && <p style={{ color: '#1d4ed8' }}>{message}</p>}
-      <form
-        onSubmit={handleSubmit}
-        style={{ maxWidth: '420px', marginTop: '1.5rem', display: 'grid', gap: '1rem' }}
-      >
+    <section style={loginWrapperStyle}>
+      <form onSubmit={handleSubmit} style={loginCardStyle}>
+        <div>
+          <h2 style={{ margin: 0 }}>Welcome back</h2>
+          {message && <p style={{ color: '#1d4ed8', marginTop: '0.35rem' }}>{message}</p>}
+        </div>
         <label htmlFor="username" style={{ fontWeight: 600 }}>
           Username
         </label>
@@ -106,7 +143,7 @@ const Login = () => {
           type="text"
           value={formValues.username}
           onChange={handleChange}
-          placeholder="vendordemo"
+          placeholder="Username"
           style={{ padding: '0.75rem', borderRadius: '8px', border: '1px solid #cbd5f5' }}
           disabled={disabled}
           autoComplete="username"
@@ -118,17 +155,33 @@ const Login = () => {
         <label htmlFor="password" style={{ fontWeight: 600 }}>
           Password
         </label>
-        <input
-          id="password"
-          name="password"
-          type="password"
-          value={formValues.password}
-          onChange={handleChange}
-          placeholder="Password123"
-          style={{ padding: '0.75rem', borderRadius: '8px', border: '1px solid #cbd5f5' }}
-          disabled={disabled}
-          autoComplete="current-password"
-        />
+        <div style={inputWrapperStyle}>
+          <input
+            id="password"
+            name="password"
+            type={showPassword ? 'text' : 'password'}
+            value={formValues.password}
+            onChange={handleChange}
+            placeholder="Password"
+            style={{
+              width: '100%',
+              padding: '0.75rem',
+              borderRadius: '8px',
+              border: '1px solid #cbd5f5',
+              boxSizing: 'border-box',
+            }}
+            disabled={disabled}
+            autoComplete="current-password"
+          />
+          <button
+            type="button"
+            onClick={() => setShowPassword((prev) => !prev)}
+            style={togglePasswordStyle}
+            aria-label={showPassword ? 'Hide password' : 'Show password'}
+          >
+            {showPassword ? 'Hide' : 'Show'}
+          </button>
+        </div>
         {showValidation && !formValues.password.trim() && (
           <p style={{ color: '#b91c1c', marginTop: '-0.5rem' }}>Password is required.</p>
         )}
@@ -152,21 +205,21 @@ const Login = () => {
         >
           {disabled ? 'Signing in…' : 'Sign In'}
         </button>
+        <div style={{ textAlign: 'left' }}>
+          <p style={{ marginBottom: '0.5rem' }}>Need an account?</p>
+          <ul style={{ listStyle: 'disc inside', color: '#2563eb', margin: 0, paddingLeft: '1rem' }}>
+            <li>
+              <Link to="/register/customer">Register as Customer</Link>
+            </li>
+            <li>
+              <Link to="/register/vendor">Register as Vendor</Link>
+            </li>
+            <li>
+              <Link to="/register/shipper">Register as Shipper</Link>
+            </li>
+          </ul>
+        </div>
       </form>
-      <div style={{ marginTop: '2rem' }}>
-        <p style={{ marginBottom: '0.5rem' }}>Need an account?</p>
-        <ul style={{ listStyle: 'disc inside', color: '#2563eb' }}>
-          <li>
-            <Link to="/register/customer">Register as Customer</Link>
-          </li>
-          <li>
-            <Link to="/register/vendor">Register as Vendor</Link>
-          </li>
-          <li>
-            <Link to="/register/shipper">Register as Shipper</Link>
-          </li>
-        </ul>
-      </div>
     </section>
   );
 };

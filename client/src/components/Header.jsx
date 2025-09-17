@@ -45,7 +45,7 @@ const Header = () => {
 
   const handleLogout = async () => {
     await dispatch(logoutUser());
-    navigate('/login');
+    navigate('/', { replace: true });
   };
 
   // Build navigation entries based on the current role/session state.
@@ -53,10 +53,11 @@ const Header = () => {
 
   const navLinks = useMemo(() => {
     if (!user) {
-      if (isWelcomeView) {
-        return [];
-      }
-      return [{ key: 'login', label: 'Login', to: '/login', highlight: true }];
+      const links = [
+        { key: 'login', label: 'Login', to: '/login', highlight: true },
+        { key: 'register', label: 'Register', to: '/register/customer' },
+      ];
+      return links;
     }
 
     const links = [
@@ -86,7 +87,7 @@ const Header = () => {
     return links;
   }, [totalQty, user, isWelcomeView]);
 
-  const shouldShowNav = !isWelcomeView && navLinks.length > 0;
+  const shouldShowNav = navLinks.length > 0;
 
   const handleToggleMenu = () => {
     setMobileMenuOpen((open) => !open);
