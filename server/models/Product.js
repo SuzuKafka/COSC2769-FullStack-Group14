@@ -9,6 +9,7 @@ const mongoose = require('mongoose');
 
 const { Schema } = mongoose;
 
+// Enforces marketplace-specific validation rules for vendor listings.
 const productSchema = new Schema(
   {
     name: {

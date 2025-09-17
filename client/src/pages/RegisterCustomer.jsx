@@ -65,6 +65,7 @@ const RegisterCustomer = () => {
   }, [registerStatus, navigate]);
 
   useEffect(() => {
+    // Reset transient registration errors when the screen unmounts.
     return () => {
       dispatch(resetRegisterState());
     };

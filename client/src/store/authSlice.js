@@ -150,6 +150,7 @@ const authSlice = createSlice({
         state.error = null;
       })
       .addCase(fetchCurrentUser.rejected, (state, action) => {
+        // Treat 401s as a soft failure so the app can continue in guest mode.
         if (action.payload?.unauthenticated) {
           state.status = 'unauthenticated';
           state.user = null;

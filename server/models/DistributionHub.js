@@ -9,6 +9,7 @@ const mongoose = require('mongoose');
 
 const { Schema } = mongoose;
 
+// Represents seeded distribution hubs used to assign shipper workloads.
 const distributionHubSchema = new Schema(
   {
     name: {

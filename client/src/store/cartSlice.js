@@ -9,6 +9,7 @@ import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { apiFetch, apiFetchJson } from '../lib/api';
 import { checkoutCart } from './checkoutSlice';
 
+// Normalise optional backend fields into a consistent shape for reducers.
 const mapCartPayload = (payload) => ({
   items: payload?.items || [],
   totalQty: payload?.totalQty || 0,

@@ -41,6 +41,7 @@ const linkStyle = {
   marginBottom: '0.5rem',
 };
 
+// Footer consolidates navigation to satisfy course rubric for discoverability.
 const Footer = () => (
   <footer style={footerStyle}>
     <div style={footerInnerStyle}>

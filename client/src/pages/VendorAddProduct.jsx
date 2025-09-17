@@ -150,6 +150,7 @@ const VendorAddProduct = () => {
   const [materialInput, setMaterialInput] = useState('');
   const [badgeInput, setBadgeInput] = useState('');
 
+  // Reset submission flags when the vendor navigates away from the form.
   useEffect(() => {
     return () => {
       dispatch(resetCreateState());

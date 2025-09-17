@@ -15,6 +15,7 @@ import './styles.css';
 const rootElement = document.getElementById('root');
 const root = ReactDOM.createRoot(rootElement);
 
+// Mount the SPA within Redux and StrictMode so development warnings stay visible.
 root.render(
   <React.StrictMode>
     <Provider store={store}>

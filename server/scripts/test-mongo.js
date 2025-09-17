@@ -9,6 +9,7 @@ const mongoose = require('mongoose');
 const path = require('path');
 const dotenv = require('dotenv');
 
+// Load the local env first, then fall back to process defaults for CI environments.
 dotenv.config({ path: path.join(__dirname, '..', '.env') });
 
 dotenv.config();

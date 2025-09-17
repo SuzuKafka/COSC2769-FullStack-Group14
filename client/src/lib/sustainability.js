@@ -1,3 +1,10 @@
+// RMIT University Vietnam
+// Course: COSC2769 - Full Stack Development
+// Semester: 2025B
+// Assessment: Assignment 02
+// Author: Ryota Suzuki
+// ID: s4075375
+
 // Shared sustainability metadata for client UI components.
 export const CATEGORY_OPTIONS = [
   'Clothing',
@@ -48,6 +55,7 @@ export const ECO_BADGE_OPTIONS = [
   },
 ];
 
+// Precompute lookup tables so UI components can resolve badge icons instantly.
 export const BADGE_ICON_MAP = ECO_BADGE_OPTIONS.reduce((map, badge) => {
   map[badge.value] = badge.icon;
   return map;

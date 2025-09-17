@@ -15,6 +15,7 @@ const containerStyle = {
   color: '#1f2937',
 };
 
+// Static copy that documents how the coursework handles personal information.
 const Privacy = () => (
   <section style={containerStyle}>
     <h1 style={{ marginBottom: '1.5rem' }}>Privacy Statement</h1>

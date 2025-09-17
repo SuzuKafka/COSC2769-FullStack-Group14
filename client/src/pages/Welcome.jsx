@@ -136,6 +136,7 @@ const Welcome = () => (
   <PageContent />
 );
 
+// Separate component handles memoized background asset resolution for SSR safety.
 const PageContent = () => {
   const uploadsBaseUrl = useMemo(() => {
     if (typeof window === 'undefined') {

@@ -15,6 +15,7 @@ const containerStyle = {
   color: '#1f2937',
 };
 
+// Aggregated support content so markers can verify feature coverage quickly.
 const Help = () => (
   <section style={containerStyle}>
     <h1 style={{ marginBottom: '1.5rem' }}>Help Centre</h1>

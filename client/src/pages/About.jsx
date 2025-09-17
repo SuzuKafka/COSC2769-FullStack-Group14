@@ -15,6 +15,7 @@ const containerStyle = {
   color: '#1f2937',
 };
 
+// Provide project background and references required in the assignment brief.
 const About = () => (
   <section style={containerStyle}>
     <h1 style={{ marginBottom: '1.5rem' }}>About EcoSwap (COSC2769 Group 14)</h1>

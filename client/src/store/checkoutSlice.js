@@ -45,6 +45,7 @@ const checkoutSlice = createSlice({
       })
       .addCase(checkoutCart.fulfilled, (state, action) => {
         state.status = 'succeeded';
+        // Capture confirmation details so the confirmation page can render without refetching.
         state.lastOrder = action.payload;
         state.error = null;
       })

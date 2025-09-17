@@ -69,6 +69,7 @@ const RegisterVendor = () => {
   }, [registerStatus, navigate]);
 
   useEffect(() => {
+    // Ensure transient auth errors do not leak between registration flows.
     return () => {
       dispatch(resetRegisterState());
     };

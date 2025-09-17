@@ -99,6 +99,7 @@ const shipperSlice = createSlice({
             };
           });
         } else {
+          // Drop orders that leave the active queue once delivered or canceled.
           state.orders = state.orders.filter(
             (existing) => (existing._id?.toString() || existing._id) !== normalisedOrderId
           );

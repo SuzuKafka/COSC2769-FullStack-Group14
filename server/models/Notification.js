@@ -9,6 +9,7 @@ const mongoose = require('mongoose');
 
 const { Schema } = mongoose;
 
+// Stores per-user notification messages surfaced by the bell component.
 const notificationSchema = new Schema(
   {
     user: {

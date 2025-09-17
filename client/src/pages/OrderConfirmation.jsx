@@ -37,6 +37,7 @@ const buttonStyle = {
 const OrderConfirmation = () => {
   const location = useLocation();
   const lastOrder = useSelector((state) => state.checkout.lastOrder);
+  // Prefer the navigation payload but fall back to Redux in case the user reloads the page.
   const order = location.state || lastOrder;
 
   if (!order) {

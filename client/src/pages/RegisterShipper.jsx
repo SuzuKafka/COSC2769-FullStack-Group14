@@ -58,6 +58,7 @@ const RegisterShipper = () => {
 
   const isSubmitting = registerStatus === 'loading';
 
+  // Fetch available hubs on mount so the select menu is populated for new shippers.
   useEffect(() => {
     if (hubsStatus === 'idle') {
       dispatch(fetchHubs());

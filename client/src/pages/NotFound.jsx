@@ -29,6 +29,7 @@ const buttonStyle = {
   fontWeight: 600,
 };
 
+// Render a friendly fallback when the user navigates to an unknown route.
 const NotFound = () => (
   <section style={containerStyle}>
     <h1 style={{ fontSize: '2rem', marginBottom: '1rem' }}>Page Not Found</h1>

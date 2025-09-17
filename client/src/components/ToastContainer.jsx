@@ -37,6 +37,7 @@ const variantMap = {
 const ToastItem = ({ toast }) => {
   const dispatch = useDispatch();
 
+  // Auto-dismiss toasts after a short delay to keep the UI from stacking indefinitely.
   useEffect(() => {
     const timeout = setTimeout(() => {
       dispatch(removeToast(toast.id));

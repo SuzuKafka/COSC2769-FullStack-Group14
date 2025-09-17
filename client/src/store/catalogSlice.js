@@ -89,6 +89,7 @@ const catalogSlice = createSlice({
         state.status = 'succeeded';
         state.items = action.payload.products;
         state.pagination = action.payload.pagination;
+        // Remember the query that produced this result so pagination and filters stay in sync.
         state.lastParams = action.payload.params || {};
         state.facets = action.payload.facets || {
           categories: [],

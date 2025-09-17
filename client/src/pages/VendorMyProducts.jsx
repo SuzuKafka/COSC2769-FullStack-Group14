@@ -99,6 +99,7 @@ const VendorMyProducts = () => {
     return assetBaseUrl ? `${assetBaseUrl}${normalizedPath}` : normalizedPath;
   };
 
+  // Trigger the vendor product fetch once the slice transitions out of its initial idle state.
   useEffect(() => {
     if (status === 'idle') {
       dispatch(fetchMyProducts());

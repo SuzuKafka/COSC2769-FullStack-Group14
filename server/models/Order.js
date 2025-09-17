@@ -33,6 +33,7 @@ const orderItemSchema = new Schema(
   { _id: false }
 );
 
+// Captures the lifecycle of a checkout, including hub assignment and shipper updates.
 const orderSchema = new Schema(
   {
     customer: {
@@ -89,6 +90,7 @@ const orderSchema = new Schema(
   }
 );
 
+// Derive order totals before validation so the server never trusts client math.
 orderSchema.pre('validate', function preValidate(next) {
   if (!this.items || this.items.length === 0) {
     return next(new Error('Order must include at least one item.'));

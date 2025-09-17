@@ -90,6 +90,7 @@ const notificationsSlice = createSlice({
       .addCase(fetchNotifications.fulfilled, (state, action) => {
         state.status = 'succeeded';
         state.items = action.payload;
+        // Keep unreadCount aligned with the latest payload so the UI badge is accurate.
         state.unreadCount = action.payload.filter((item) => !item.read).length;
       })
       .addCase(fetchNotifications.rejected, (state, action) => {

@@ -15,6 +15,7 @@ import shipperReducer from './shipperSlice';
 import uiReducer, { addToast } from './uiSlice';
 import notificationsReducer from './notificationsSlice';
 
+// Surface API errors centrally so individual slices stay lean.
 const errorToastMiddleware = (storeApi) => (next) => (action) => {
   const result = next(action);
 

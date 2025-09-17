@@ -31,6 +31,7 @@ const buttonStyle = {
 
 const Forbidden = () => {
   const location = useLocation();
+  // Allow upstream navigation guards to pass a contextual message via router state.
   const message = location.state?.message;
 
   return (

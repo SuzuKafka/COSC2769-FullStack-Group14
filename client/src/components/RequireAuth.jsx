@@ -13,6 +13,7 @@ const RequireAuth = ({ allowedRoles }) => {
   const { user, status } = useSelector((state) => state.auth);
   const location = useLocation();
 
+  // Preserve the user’s original location so we can return them after logging in.
   const buildRedirect = (message) => (
     <Navigate
       to="/login"

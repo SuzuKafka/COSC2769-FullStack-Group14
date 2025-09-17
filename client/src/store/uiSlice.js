@@ -7,6 +7,7 @@
 
 import { createSlice } from '@reduxjs/toolkit';
 
+// Generate toast metadata with a unique id so the reducer can target removals.
 const createToast = ({ message, variant = 'info' }) => ({
   id: `${Date.now()}-${Math.round(Math.random() * 1e6)}`,
   message,

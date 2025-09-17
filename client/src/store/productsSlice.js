@@ -58,6 +58,7 @@ const productsSlice = createSlice({
       })
       .addCase(createProduct.fulfilled, (state, action) => {
         state.createStatus = 'succeeded';
+        // Insert the newly created product at the top so it surfaces immediately in dashboards.
         state.items.unshift(action.payload);
       })
       .addCase(createProduct.rejected, (state, action) => {

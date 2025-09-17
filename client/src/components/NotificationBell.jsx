@@ -115,6 +115,7 @@ const NotificationBell = () => {
   const [isOpen, setIsOpen] = useState(false);
   const containerRef = useRef(null);
 
+  // Sync notification lifecycle with authentication so stale data disappears after logout.
   useEffect(() => {
     if (user && status === 'idle') {
       dispatch(fetchNotifications());
