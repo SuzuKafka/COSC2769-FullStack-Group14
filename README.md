@@ -2,8 +2,13 @@
 
 **Course:** COSC2769 – Full Stack Development
 
+**Repository:** https://github.com/SuzuKafka/COSC2769-FullStack-Group14
+**Presentation & Demo Video:** https://rmiteduau-my.sharepoint.com/:v:/g/personal/s4075375_rmit_edu_vn/EYFMLp-qA2lJpVCLbUsT96YBVOR2qqRu9wNdRO8rNwe8VQ?nav=eyJyZWZlcnJhbEluZm8iOnsicmVmZXJyYWxBcHAiOiJTdHJlYW1XZWJBcHAiLCJyZWZlcnJhbFZpZXciOiJTaGFyZURpYWxvZy1MaW5rIiwicmVmZXJyYWxBcHBQbGF0Zm9ybSI6IldlYiIsInJlZmVycmFsTW9kZSI6InZpZXcifX0%3D&e=nVXda0
+
 **Group 14 Members:**
 - Ryota Suzuki
+
+**Solo Development Note:** This project was developed solo (Group 14: Ryota Suzuki), with lecturer awareness. Contribution is therefore 100%.
 
 ## Quick Start
 1. Install dependencies in both workspaces:
@@ -77,11 +82,7 @@ Before testing, ensure your MongoDB Atlas cluster accepts connections from all m
 - `dev` – active development integration branch.
 - `feature/*` – short-lived branches per module (for example, `feature/auth`, `feature/cart`).
 
-- **Demo Video:** _TBD_
-
 - **Contribution Table:**  
   | Member Name   | Role        | Assigned Tasks | Contribution Score |
   |---------------|-------------|----------------|--------------------|
   | Ryota Suzuki  | Everything  | All tasks      | 7.0 |
-
-- **Report (PDF):** _TBD_
