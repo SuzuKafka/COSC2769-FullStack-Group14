@@ -49,7 +49,16 @@ const Header = () => {
   };
 
   // Build navigation entries based on the current role/session state.
+  const isWelcomeView = !user && (location.pathname === '/' || location.pathname.startsWith('/welcome'));
+
   const navLinks = useMemo(() => {
+    if (!user) {
+      if (isWelcomeView) {
+        return [];
+      }
+      return [{ key: 'login', label: 'Login', to: '/login', highlight: true }];
+    }
+
     const links = [
       { key: 'browse', label: 'Browse', to: '/browse' },
       {
@@ -60,26 +69,24 @@ const Header = () => {
       },
     ];
 
-    if (user?.role === 'vendor') {
+    if (user.role === 'vendor') {
       links.push(
         { key: 'vendor-new', label: 'Add Product', to: '/vendor/new-product' },
         { key: 'vendor-products', label: 'My Products', to: '/vendor/my-products' },
       );
     }
 
-    if (user?.role === 'shipper') {
+    if (user.role === 'shipper') {
       links.push({ key: 'shipper-orders', label: 'Shipper Orders', to: '/shipper/orders' });
     }
 
-    if (user) {
-      links.push({ key: 'account', label: 'My Account', to: '/account' });
-      links.push({ key: 'logout', label: 'Log Out', type: 'button', variant: 'danger' });
-    } else {
-      links.push({ key: 'login', label: 'Login', to: '/login', highlight: true });
-    }
+    links.push({ key: 'account', label: 'My Account', to: '/account' });
+    links.push({ key: 'logout', label: 'Log Out', type: 'button', variant: 'danger' });
 
     return links;
-  }, [totalQty, user]);
+  }, [totalQty, user, isWelcomeView]);
+
+  const shouldShowNav = !isWelcomeView && navLinks.length > 0;
 
   const handleToggleMenu = () => {
     setMobileMenuOpen((open) => !open);
@@ -106,61 +113,65 @@ const Header = () => {
         </Link>
         <div className="site-header__actions">
           {user && <NotificationBell />}
-          <button
-            type="button"
-            className="site-header__toggle"
-            aria-label="Toggle navigation"
-            aria-expanded={isMobileMenuOpen}
-            onClick={handleToggleMenu}
-          >
-            <span />
-            <span />
-            <span />
-          </button>
+          {shouldShowNav && (
+            <button
+              type="button"
+              className="site-header__toggle"
+              aria-label="Toggle navigation"
+              aria-expanded={isMobileMenuOpen}
+              onClick={handleToggleMenu}
+            >
+              <span />
+              <span />
+              <span />
+            </button>
+          )}
         </div>
       </div>
-      <nav
-        className={`site-header__nav ${
-          isMobile ? 'site-header__nav--mobile' : 'site-header__nav--desktop'
-        } ${isMobileMenuOpen ? 'site-header__nav--open' : ''}`}
-      >
-        <ul>
-          {navLinks.map((link) => {
-            const isActive = link.to && location.pathname.startsWith(link.to);
-            if (link.type === 'button') {
+      {shouldShowNav && (
+        <nav
+          className={`site-header__nav ${
+            isMobile ? 'site-header__nav--mobile' : 'site-header__nav--desktop'
+          } ${isMobileMenuOpen ? 'site-header__nav--open' : ''}`}
+        >
+          <ul>
+            {navLinks.map((link) => {
+              const isActive = link.to && location.pathname.startsWith(link.to);
+              if (link.type === 'button') {
+                return (
+                  <li key={link.key}>
+                    <button
+                      type="button"
+                      className={`site-header__link site-header__link--button ${
+                        isActive ? 'site-header__link--active' : ''
+                      } ${link.variant === 'danger' ? 'site-header__link--danger' : ''}`}
+                      onClick={() => handleNavAction(link)}
+                      disabled={loginStatus === 'loading'}
+                    >
+                      {loginStatus === 'loading' ? 'Logging out…' : link.label}
+                    </button>
+                  </li>
+                );
+              }
+
               return (
                 <li key={link.key}>
-                  <button
-                    type="button"
-                    className={`site-header__link site-header__link--button ${
-                      isActive ? 'site-header__link--active' : ''
-                    } ${link.variant === 'danger' ? 'site-header__link--danger' : ''}`}
+                  <Link
+                    to={link.to}
+                    className={`site-header__link ${isActive ? 'site-header__link--active' : ''} ${
+                      link.highlight ? 'site-header__link--highlight' : ''
+                    }`}
                     onClick={() => handleNavAction(link)}
-                    disabled={loginStatus === 'loading'}
                   >
-                    {loginStatus === 'loading' ? 'Logging out…' : link.label}
-                  </button>
+                    <span>{link.label}</span>
+                    {link.badge && <span className="site-header__badge">{link.badge}</span>}
+                  </Link>
                 </li>
               );
-            }
-
-            return (
-              <li key={link.key}>
-                <Link
-                  to={link.to}
-                  className={`site-header__link ${isActive ? 'site-header__link--active' : ''} ${
-                    link.highlight ? 'site-header__link--highlight' : ''
-                  }`}
-                  onClick={() => handleNavAction(link)}
-                >
-                  <span>{link.label}</span>
-                  {link.badge && <span className="site-header__badge">{link.badge}</span>}
-                </Link>
-              </li>
-            );
-          })}
-        </ul>
-      </nav>
+            })}
+          </ul>
+        </nav>
+      )}
     </header>
   );
 };

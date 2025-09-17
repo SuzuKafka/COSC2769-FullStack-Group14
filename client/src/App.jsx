@@ -6,7 +6,15 @@
 // ID: s4075375
 
 import React, { useEffect, useState } from 'react';
-import { BrowserRouter, Routes, Route, useLocation, useNavigate, Link } from 'react-router-dom';
+import {
+  BrowserRouter,
+  Routes,
+  Route,
+  useLocation,
+  useNavigate,
+  Link,
+  Navigate,
+} from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import Header from './components/Header';
 import Footer from './components/Footer';
@@ -28,6 +36,7 @@ import Help from './pages/Help';
 import RegisterVendor from './pages/RegisterVendor';
 import RegisterCustomer from './pages/RegisterCustomer';
 import RegisterShipper from './pages/RegisterShipper';
+import Welcome from './pages/Welcome';
 import { fetchCurrentUser, loginUser, clearLoginState } from './store/authSlice';
 import { getCart } from './store/cartSlice';
 
@@ -163,6 +172,43 @@ const Login = () => {
 };
 
 // Routes guarded by header/footer and responsible for initial auth/cart hydration.
+const HomeRoute = () => {
+  const { user, status } = useSelector((state) => state.auth);
+
+  if (status === 'loading' || status === 'idle') {
+    return (
+      <section style={pageContainerStyle}>
+        <p>Loading your experience…</p>
+      </section>
+    );
+  }
+
+  if (user) {
+    return <Navigate to="/browse" replace />;
+  }
+
+  return <Welcome />;
+};
+
+const BrowseRoute = () => {
+  const { user, status } = useSelector((state) => state.auth);
+  const location = useLocation();
+
+  if (status === 'loading' || status === 'idle') {
+    return (
+      <section style={pageContainerStyle}>
+        <p>Loading your experience…</p>
+      </section>
+    );
+  }
+
+  if (!user) {
+    return <Navigate to="/" replace state={{ from: location }} />;
+  }
+
+  return <Browse />;
+};
+
 const AppContent = () => {
   const dispatch = useDispatch();
   const authStatus = useSelector((state) => state.auth.status);
@@ -186,8 +232,9 @@ const AppContent = () => {
       <ToastContainer />
       <main style={mainStyle}>
         <Routes>
-          <Route path="/" element={<Browse />} />
-          <Route path="/browse" element={<Browse />} />
+          <Route path="/" element={<HomeRoute />} />
+          <Route path="/welcome" element={<Welcome />} />
+          <Route path="/browse" element={<BrowseRoute />} />
           <Route path="/login" element={<Login />} />
           <Route path="/product/:id" element={<ProductDetail />} />
           <Route path="/cart" element={<Cart />} />
