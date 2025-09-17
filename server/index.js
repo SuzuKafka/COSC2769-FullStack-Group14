@@ -100,9 +100,6 @@ if (fs.existsSync(clientBuildPath)) {
 }
 
 app.use((err, req, res, next) => {
-  // eslint-disable-next-line no-console
-  console.error(err);
-
   let status = err.status || 500;
   let message = err.message || 'Internal Server Error';
 
@@ -113,6 +110,11 @@ app.use((err, req, res, next) => {
     status = 409;
     const duplicateField = Object.keys(err.keyValue || {})[0];
     message = duplicateField ? `Duplicate value for ${duplicateField}.` : 'Duplicate key error.';
+  }
+
+  if (status >= 500 || isDevelopment) {
+    // eslint-disable-next-line no-console
+    console.error(err);
   }
 
   if (!isDevelopment && status >= 500) {
